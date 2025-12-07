@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useAuthStore } from '@/features/auth/stores/auth.store';
+import { useTranslation } from '@/features/i18n/hooks/useTranslation';
 
 type ProfilePageProps = {
   params: Promise<Record<string, never>>;
@@ -46,6 +47,7 @@ const programs = [
 export default function ProfilePage({ params }: ProfilePageProps) {
   void params;
   const { user } = useAuthStore();
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [formData, setFormData] = useState({
@@ -86,18 +88,18 @@ export default function ProfilePage({ params }: ProfilePageProps) {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">프로필 설정</h1>
+        <h1 className="text-3xl font-bold">{t('profile.title')}</h1>
         <p className="text-muted-foreground mt-1">
-          개인 정보를 관리하고 업데이트하세요
+          {t('profile.description')}
         </p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
         <Card className="md:col-span-1">
           <CardHeader>
-            <CardTitle>프로필 사진</CardTitle>
+            <CardTitle>{t('profile.profilePhoto')}</CardTitle>
             <CardDescription>
-              프로필 이미지를 변경하세요
+              {t('profile.changeProfileImage')}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col items-center">
@@ -108,36 +110,36 @@ export default function ProfilePage({ params }: ProfilePageProps) {
               </AvatarFallback>
             </Avatar>
             <Button variant="outline" size="sm">
-              이미지 변경
+              {t('profile.changeImage')}
             </Button>
           </CardContent>
         </Card>
 
         <Card className="md:col-span-2">
           <CardHeader>
-            <CardTitle>기본 정보</CardTitle>
+            <CardTitle>{t('profile.basicInfo')}</CardTitle>
             <CardDescription>
-              개인 정보와 학적 정보를 입력하세요
+              {t('profile.enterPersonalInfo')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="fullName">이름</Label>
+                <Label htmlFor="fullName">{t('profile.name')}</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="fullName"
                     value={formData.fullName}
                     onChange={(e) => handleInputChange('fullName', e.target.value)}
-                    placeholder="이름을 입력하세요"
+                    placeholder={t('profile.enterName')}
                     className="pl-10"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">이메일</Label>
+                <Label htmlFor="email">{t('profile.email')}</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -149,21 +151,21 @@ export default function ProfilePage({ params }: ProfilePageProps) {
                   />
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  이메일은 변경할 수 없습니다
+                  {t('profile.emailCannotBeChanged')}
                 </p>
               </div>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="department">소속</Label>
+                <Label htmlFor="department">{t('profile.department')}</Label>
                 <Select
                   value={formData.department}
                   onValueChange={(value) => handleInputChange('department', value)}
                 >
                   <SelectTrigger id="department">
                     <Building2 className="mr-2 h-4 w-4 text-muted-foreground" />
-                    <SelectValue placeholder="소속을 선택하세요" />
+                    <SelectValue placeholder={t('profile.selectDepartment')} />
                   </SelectTrigger>
                   <SelectContent>
                     {departments.map((dept) => (
@@ -176,13 +178,13 @@ export default function ProfilePage({ params }: ProfilePageProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="program">프로그램</Label>
+                <Label htmlFor="program">{t('profile.program')}</Label>
                 <Select
                   value={formData.program}
                   onValueChange={(value) => handleInputChange('program', value)}
                 >
                   <SelectTrigger id="program">
-                    <SelectValue placeholder="프로그램을 선택하세요" />
+                    <SelectValue placeholder={t('profile.selectProgram')} />
                   </SelectTrigger>
                   <SelectContent>
                     {programs.map((prog) => (
@@ -196,12 +198,12 @@ export default function ProfilePage({ params }: ProfilePageProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="studentId">학번</Label>
+              <Label htmlFor="studentId">{t('profile.studentId')}</Label>
               <Input
                 id="studentId"
                 value={formData.studentId}
                 onChange={(e) => handleInputChange('studentId', e.target.value)}
-                placeholder="학번을 입력하세요 (선택)"
+                placeholder={t('profile.enterStudentId')}
               />
             </div>
 
@@ -210,17 +212,17 @@ export default function ProfilePage({ params }: ProfilePageProps) {
                 {isLoading ? (
                   <>
                     <Save className="mr-2 h-4 w-4 animate-pulse" />
-                    저장 중...
+                    {t('profile.saving')}
                   </>
                 ) : isSaved ? (
                   <>
                     <Check className="mr-2 h-4 w-4" />
-                    저장됨
+                    {t('profile.saved')}
                   </>
                 ) : (
                   <>
                     <Save className="mr-2 h-4 w-4" />
-                    저장하기
+                    {t('profile.save')}
                   </>
                 )}
               </Button>
@@ -231,40 +233,40 @@ export default function ProfilePage({ params }: ProfilePageProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle>계정 설정</CardTitle>
+          <CardTitle>{t('profile.accountSettings')}</CardTitle>
           <CardDescription>
-            계정 관련 설정을 관리하세요
+            {t('profile.manageAccountSettings')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between py-3 border-b">
             <div>
-              <h4 className="font-medium">비밀번호 변경</h4>
+              <h4 className="font-medium">{t('profile.changePassword')}</h4>
               <p className="text-sm text-muted-foreground">
-                계정 비밀번호를 변경합니다
+                {t('profile.changeAccountPassword')}
               </p>
             </div>
-            <Button variant="outline">변경하기</Button>
+            <Button variant="outline">{t('profile.change')}</Button>
           </div>
 
           <div className="flex items-center justify-between py-3 border-b">
             <div>
-              <h4 className="font-medium">알림 설정</h4>
+              <h4 className="font-medium">{t('profile.notificationSettings')}</h4>
               <p className="text-sm text-muted-foreground">
-                이메일 및 앱 알림을 관리합니다
+                {t('profile.manageNotifications')}
               </p>
             </div>
-            <Button variant="outline">설정하기</Button>
+            <Button variant="outline">{t('profile.configure')}</Button>
           </div>
 
           <div className="flex items-center justify-between py-3">
             <div>
-              <h4 className="font-medium text-destructive">계정 삭제</h4>
+              <h4 className="font-medium text-destructive">{t('profile.deleteAccount')}</h4>
               <p className="text-sm text-muted-foreground">
-                계정을 영구적으로 삭제합니다
+                {t('profile.permanentlyDeleteAccount')}
               </p>
             </div>
-            <Button variant="destructive">삭제하기</Button>
+            <Button variant="destructive">{t('profile.delete')}</Button>
           </div>
         </CardContent>
       </Card>

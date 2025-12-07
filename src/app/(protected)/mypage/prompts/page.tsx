@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/features/i18n/hooks/useTranslation';
 
 type PromptsPageProps = {
   params: Promise<Record<string, never>>;
@@ -68,6 +69,7 @@ const mockPrompts: PromptHistory[] = [
 
 export default function PromptsPage({ params }: PromptsPageProps) {
   void params;
+  const { t } = useTranslation();
   const [prompts, setPrompts] = useState<PromptHistory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -90,11 +92,11 @@ export default function PromptsPage({ params }: PromptsPageProps) {
     });
   };
 
-  const getStepTypeLabel = (stepType: string) => {
+  const getStepTypeLabel = (stepType: string, t: ReturnType<typeof useTranslation>['t']) => {
     const labels: Record<string, string> = {
-      prompt_writing: '프롬프트 작성',
-      comparison_lab: '비교 실험실',
-      socratic_dialogue: '소크라테스 대화',
+      prompt_writing: t('prompts.promptWriting'),
+      comparison_lab: t('prompts.comparisonLab'),
+      socratic_dialogue: t('prompts.socraticDialogue'),
     };
     return labels[stepType] || stepType;
   };
@@ -130,9 +132,9 @@ export default function PromptsPage({ params }: PromptsPageProps) {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">프롬프트 히스토리</h1>
+        <h1 className="text-3xl font-bold">{t('prompts.title')}</h1>
         <p className="text-muted-foreground mt-1">
-          학습 과정에서 작성한 프롬프트를 확인하고 재사용하세요
+          {t('prompts.description')}
         </p>
       </div>
 
@@ -141,7 +143,7 @@ export default function PromptsPage({ params }: PromptsPageProps) {
           <History className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             type="text"
-            placeholder="프롬프트 검색..."
+            placeholder={t('prompts.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -152,23 +154,23 @@ export default function PromptsPage({ params }: PromptsPageProps) {
           onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
         >
           <Star className="mr-2 h-4 w-4" />
-          즐겨찾기만 보기
+          {t('prompts.showFavoritesOnly')}
         </Button>
       </div>
 
       <div className="text-sm text-muted-foreground">
-        총 {filteredPrompts.length}개의 프롬프트
+        {t('prompts.totalPrompts', { count: filteredPrompts.length })}
       </div>
 
       {filteredPrompts.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
             <History className="h-12 w-12 mx-auto text-muted-foreground opacity-50 mb-4" />
-            <h3 className="text-lg font-medium">프롬프트 기록이 없습니다</h3>
+            <h3 className="text-lg font-medium">{t('prompts.noPromptsYet')}</h3>
             <p className="text-muted-foreground mt-1">
               {showFavoritesOnly
-                ? '즐겨찾기한 프롬프트가 없습니다'
-                : '모듈 학습을 진행하면 프롬프트가 기록됩니다'}
+                ? t('prompts.noFavorites')
+                : t('prompts.promptsWillBeRecorded')}
             </p>
           </CardContent>
         </Card>
@@ -182,7 +184,7 @@ export default function PromptsPage({ params }: PromptsPageProps) {
                     <Badge variant="outline">{prompt.moduleTitle}</Badge>
                     <Badge variant="secondary">
                       <Tag className="mr-1 h-3 w-3" />
-                      {getStepTypeLabel(prompt.stepType)}
+                      {getStepTypeLabel(prompt.stepType, t)}
                     </Badge>
                     {prompt.rating && (
                       <div className="flex items-center gap-1">

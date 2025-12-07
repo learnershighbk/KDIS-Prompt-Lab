@@ -14,6 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ROUTES } from '@/constants/routes';
+import { useTranslation } from '@/features/i18n/hooks/useTranslation';
 
 type JournalsPageProps = {
   params: Promise<Record<string, never>>;
@@ -53,6 +54,7 @@ const mockJournals: JournalEntry[] = [
 
 export default function JournalsPage({ params }: JournalsPageProps) {
   void params;
+  const { t } = useTranslation();
   const [journals, setJournals] = useState<JournalEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -86,9 +88,9 @@ export default function JournalsPage({ params }: JournalsPageProps) {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">성찰 저널</h1>
+        <h1 className="text-3xl font-bold">{t('journals.title')}</h1>
         <p className="text-muted-foreground mt-1">
-          각 모듈 학습 후 작성한 성찰 기록을 확인하세요
+          {t('journals.description')}
         </p>
       </div>
 
@@ -96,12 +98,12 @@ export default function JournalsPage({ params }: JournalsPageProps) {
         <Card>
           <CardContent className="py-12 text-center">
             <BookMarked className="h-12 w-12 mx-auto text-muted-foreground opacity-50 mb-4" />
-            <h3 className="text-lg font-medium">아직 작성한 저널이 없습니다</h3>
+            <h3 className="text-lg font-medium">{t('journals.noJournalsYet')}</h3>
             <p className="text-muted-foreground mt-1 mb-4">
-              모듈 학습을 완료하고 성찰 저널을 작성해보세요
+              {t('journals.completeModuleToWrite')}
             </p>
             <Button asChild>
-              <Link href={ROUTES.MODULES}>학습 시작하기</Link>
+              <Link href={ROUTES.MODULES}>{t('journals.startLearning')}</Link>
             </Button>
           </CardContent>
         </Card>
@@ -125,7 +127,7 @@ export default function JournalsPage({ params }: JournalsPageProps) {
                     </CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline">완료</Badge>
+                    <Badge variant="outline">{t('journals.completed')}</Badge>
                     {expandedId === journal.id ? (
                       <ChevronUp className="h-5 w-5" />
                     ) : (
@@ -140,7 +142,7 @@ export default function JournalsPage({ params }: JournalsPageProps) {
                   <div className="space-y-4">
                     <div>
                       <h4 className="font-medium text-sm text-muted-foreground mb-2">
-                        가장 인상 깊었던 내용
+                        {t('journals.mostImpressive')}
                       </h4>
                       <p className="text-sm bg-muted p-3 rounded-lg">
                         {journal.answers.learned}
@@ -149,7 +151,7 @@ export default function JournalsPage({ params }: JournalsPageProps) {
 
                     <div>
                       <h4 className="font-medium text-sm text-muted-foreground mb-2">
-                        실제 업무 적용 방안
+                        {t('journals.practicalApplication')}
                       </h4>
                       <p className="text-sm bg-muted p-3 rounded-lg">
                         {journal.answers.applied}
@@ -158,7 +160,7 @@ export default function JournalsPage({ params }: JournalsPageProps) {
 
                     <div>
                       <h4 className="font-medium text-sm text-muted-foreground mb-2">
-                        학습 과정의 어려움
+                        {t('journals.learningChallenges')}
                       </h4>
                       <p className="text-sm bg-muted p-3 rounded-lg">
                         {journal.answers.challenges}
@@ -167,7 +169,7 @@ export default function JournalsPage({ params }: JournalsPageProps) {
 
                     <div>
                       <h4 className="font-medium text-sm text-muted-foreground mb-2">
-                        발전시키고 싶은 부분
+                        {t('journals.areasForImprovement')}
                       </h4>
                       <p className="text-sm bg-muted p-3 rounded-lg">
                         {journal.answers.improvement}
@@ -178,7 +180,7 @@ export default function JournalsPage({ params }: JournalsPageProps) {
                   <div className="pt-4 border-t">
                     <Button variant="outline" size="sm" asChild>
                       <Link href={ROUTES.MODULE(journal.moduleId)}>
-                        모듈 다시 보기
+                        {t('journals.reviewModule')}
                         <ExternalLink className="ml-2 h-3 w-3" />
                       </Link>
                     </Button>

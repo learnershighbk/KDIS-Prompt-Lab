@@ -17,6 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { ROUTES } from '@/constants/routes';
 import { useModules } from '@/features/modules/hooks/useModules';
+import { useTranslation } from '@/features/i18n/hooks/useTranslation';
 
 type ModulesPageProps = {
   params: Promise<Record<string, never>>;
@@ -30,6 +31,7 @@ function getStepsCompletedFromPercentage(percentage: number): number {
 
 export default function ModulesPage({ params }: ModulesPageProps) {
   void params;
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const { data, isLoading, error } = useModules();
 
@@ -50,15 +52,15 @@ export default function ModulesPage({ params }: ModulesPageProps) {
 
   const getStatusBadge = (module: typeof modules[0]) => {
     if (module.isLocked) {
-      return <Badge variant="secondary">잠김</Badge>;
+      return <Badge variant="secondary">{t('modules.locked')}</Badge>;
     }
     if (module.progress?.status === 'completed') {
-      return <Badge className="bg-green-500">완료</Badge>;
+      return <Badge className="bg-green-500">{t('modules.completed')}</Badge>;
     }
     if (module.progress?.status === 'in_progress') {
-      return <Badge className="bg-blue-500">진행 중</Badge>;
+      return <Badge className="bg-blue-500">{t('modules.inProgress')}</Badge>;
     }
-    return <Badge variant="outline">시작 가능</Badge>;
+    return <Badge variant="outline">{t('modules.available')}</Badge>;
   };
 
   const filteredModules = modules.filter(
@@ -78,7 +80,7 @@ export default function ModulesPage({ params }: ModulesPageProps) {
   if (error) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-destructive">모듈을 불러오는 중 오류가 발생했습니다.</p>
+        <p className="text-destructive">{t('modules.errorLoading')}</p>
       </div>
     );
   }
@@ -86,9 +88,9 @@ export default function ModulesPage({ params }: ModulesPageProps) {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">학습 모듈</h1>
+        <h1 className="text-3xl font-bold">{t('modules.title')}</h1>
         <p className="text-muted-foreground mt-1">
-          {modules.length}개의 모듈을 순서대로 학습하며 프롬프트 엔지니어링 역량을 키워보세요
+          {t('modules.description', { count: modules.length })}
         </p>
       </div>
 
@@ -96,7 +98,7 @@ export default function ModulesPage({ params }: ModulesPageProps) {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           type="text"
-          placeholder="모듈 검색..."
+          placeholder={t('modules.searchPlaceholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="pl-10"
@@ -144,7 +146,10 @@ export default function ModulesPage({ params }: ModulesPageProps) {
                     <div className="text-sm text-muted-foreground">
                       {module.progress && module.progress.status !== 'not_started' && (
                         <span>
-                          진행률: {stepsCompleted}/{STEP_TOTAL} 단계
+                          {t('modules.progress', {
+                            completed: stepsCompleted,
+                            total: STEP_TOTAL,
+                          })}
                         </span>
                       )}
                     </div>
@@ -155,16 +160,16 @@ export default function ModulesPage({ params }: ModulesPageProps) {
                       {!module.isLocked ? (
                         <Link href={ROUTES.MODULE(module.id)}>
                           {module.progress?.status === 'completed'
-                            ? '다시 학습하기'
+                            ? t('modules.reviewAgain')
                             : module.progress?.status === 'in_progress'
-                            ? '이어서 학습하기'
-                            : '학습 시작하기'}
+                            ? t('modules.continueLearning')
+                            : t('modules.startLearning')}
                           <ArrowRight className="ml-2 h-4 w-4" />
                         </Link>
                       ) : (
                         <span>
                           <Lock className="mr-2 h-4 w-4" />
-                          이전 모듈 완료 필요
+                          {t('modules.previousModuleRequired')}
                         </span>
                       )}
                     </Button>

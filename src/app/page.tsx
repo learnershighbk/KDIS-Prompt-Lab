@@ -225,12 +225,17 @@ export default function LandingPage() {
             </Link>
           ) : (
             <>
-              <Link
-                href="/login"
-                className="hidden sm:block text-sm font-medium transition-opacity hover:opacity-60"
-                style={{ color: "#292727" }}
-              >
-                {t('auth.login')}
+              <Link href="/login">
+                <button
+                  className="px-5 py-2.5 text-sm font-medium rounded-full transition-all hover:scale-105"
+                  style={{
+                    backgroundColor: "transparent",
+                    color: "#292727",
+                    border: "1px solid rgba(0,0,0,0.15)",
+                  }}
+                >
+                  {t('auth.login')}
+                </button>
               </Link>
               <Link href="/signup">
                 <button

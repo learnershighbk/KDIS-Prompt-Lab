@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useTranslation } from '@/features/i18n/hooks/useTranslation';
 
 type ResourcesPageProps = {
   params: Promise<Record<string, never>>;
@@ -93,18 +94,19 @@ const getTypeIcon = (type: Resource['type']) => {
   }
 };
 
-const getTypeBadge = (type: Resource['type']) => {
+const getTypeBadge = (type: Resource['type'], t: ReturnType<typeof useTranslation>['t']) => {
   const typeLabels = {
-    article: '아티클',
-    video: '동영상',
-    document: '문서',
-    link: '외부 링크',
+    article: t('resources.article'),
+    video: t('resources.video'),
+    document: t('resources.document'),
+    link: t('resources.externalLink'),
   };
   return typeLabels[type];
 };
 
 export default function ResourcesPage({ params }: ResourcesPageProps) {
   void params;
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
@@ -125,9 +127,9 @@ export default function ResourcesPage({ params }: ResourcesPageProps) {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">학습 리소스</h1>
+        <h1 className="text-3xl font-bold">{t('resources.title')}</h1>
         <p className="text-muted-foreground mt-1">
-          프롬프트 엔지니어링 학습에 도움이 되는 다양한 자료를 제공합니다
+          {t('resources.description')}
         </p>
       </div>
 
@@ -136,7 +138,7 @@ export default function ResourcesPage({ params }: ResourcesPageProps) {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             type="text"
-            placeholder="리소스 검색..."
+            placeholder={t('resources.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -147,13 +149,13 @@ export default function ResourcesPage({ params }: ResourcesPageProps) {
           <Select value={typeFilter} onValueChange={setTypeFilter}>
             <SelectTrigger className="w-[140px]">
               <Filter className="h-4 w-4 mr-2" />
-              <SelectValue placeholder="유형" />
+              <SelectValue placeholder={t('resources.type')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">모든 유형</SelectItem>
+              <SelectItem value="all">{t('resources.allTypes')}</SelectItem>
               {types.map((type) => (
                 <SelectItem key={type} value={type}>
-                  {getTypeBadge(type)}
+                  {getTypeBadge(type, t)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -161,10 +163,10 @@ export default function ResourcesPage({ params }: ResourcesPageProps) {
 
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
             <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="카테고리" />
+              <SelectValue placeholder={t('resources.category')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">모든 카테고리</SelectItem>
+              <SelectItem value="all">{t('resources.allCategories')}</SelectItem>
               {categories.map((category) => (
                 <SelectItem key={category} value={category}>
                   {category}
@@ -176,7 +178,7 @@ export default function ResourcesPage({ params }: ResourcesPageProps) {
       </div>
 
       <div className="text-sm text-muted-foreground">
-        총 {filteredResources.length}개의 리소스
+        {t('resources.totalResources', { count: filteredResources.length })}
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -187,7 +189,7 @@ export default function ResourcesPage({ params }: ResourcesPageProps) {
                 <div className="flex items-center gap-2 text-muted-foreground">
                   {getTypeIcon(resource.type)}
                   <Badge variant="outline" className="text-xs">
-                    {getTypeBadge(resource.type)}
+                    {getTypeBadge(resource.type, t)}
                   </Badge>
                 </div>
                 <Badge variant="secondary" className="text-xs">
@@ -206,7 +208,7 @@ export default function ResourcesPage({ params }: ResourcesPageProps) {
                 )}
                 <Button variant="outline" size="sm" asChild className="ml-auto">
                   <a href={resource.url} target="_blank" rel="noopener noreferrer">
-                    열기
+                    {t('resources.open')}
                     <ExternalLink className="ml-2 h-3 w-3" />
                   </a>
                 </Button>
@@ -219,9 +221,9 @@ export default function ResourcesPage({ params }: ResourcesPageProps) {
       {filteredResources.length === 0 && (
         <div className="text-center py-12">
           <BookOpen className="h-12 w-12 mx-auto text-muted-foreground opacity-50 mb-4" />
-          <h3 className="text-lg font-medium">검색 결과가 없습니다</h3>
+          <h3 className="text-lg font-medium">{t('resources.noResults')}</h3>
           <p className="text-muted-foreground mt-1">
-            다른 검색어나 필터를 시도해보세요
+            {t('resources.tryDifferentSearch')}
           </p>
         </div>
       )}

@@ -16,6 +16,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser';
+import { useTranslation } from '@/features/i18n/hooks/useTranslation';
 import { ROUTES } from '@/constants/routes';
 
 interface ModuleProgress {
@@ -48,6 +49,7 @@ type DashboardPageProps = {
 export default function DashboardPage({ params }: DashboardPageProps) {
   void params;
   const { user } = useCurrentUser();
+  const { t } = useTranslation();
   const [progressData, setProgressData] = useState<ProgressData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -138,23 +140,28 @@ export default function DashboardPage({ params }: DashboardPageProps) {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold">
-          안녕하세요, {user?.userMetadata?.full_name ?? '학습자'}님!
+          {user?.userMetadata?.full_name
+            ? t('dashboard.greeting', { name: user.userMetadata.full_name })
+            : t('dashboard.greetingDefault')}
         </h1>
         <p className="text-muted-foreground mt-1">
-          오늘도 프롬프트 엔지니어링 역량을 키워보세요.
+          {t('dashboard.subtitle')}
         </p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">전체 진도</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('dashboard.overallProgress')}</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{progressData?.overall.percentage ?? 0}%</div>
             <p className="text-xs text-muted-foreground">
-              {progressData?.overall.completedModules ?? 0} / {progressData?.overall.totalModules ?? 5} 모듈 완료
+              {t('dashboard.modulesCompleted', {
+                completed: progressData?.overall.completedModules ?? 0,
+                total: progressData?.overall.totalModules ?? 5,
+              })}
             </p>
             <div className="mt-3 h-2 w-full bg-secondary rounded-full overflow-hidden">
               <div
@@ -167,13 +174,13 @@ export default function DashboardPage({ params }: DashboardPageProps) {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">획득한 배지</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('dashboard.earnedBadges')}</CardTitle>
             <Trophy className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{progressData?.badges.length ?? 0}</div>
             <p className="text-xs text-muted-foreground">
-              프롬프트 테크닉 배지
+              {t('dashboard.promptTechniqueBadges')}
             </p>
             <div className="mt-3 flex flex-wrap gap-1">
               {progressData?.badges.slice(0, 3).map((badge) => (
@@ -182,7 +189,7 @@ export default function DashboardPage({ params }: DashboardPageProps) {
                 </Badge>
               ))}
               {(progressData?.badges.length ?? 0) === 0 && (
-                <span className="text-xs text-muted-foreground">아직 획득한 배지가 없습니다</span>
+                <span className="text-xs text-muted-foreground">{t('dashboard.noBadgesYet')}</span>
               )}
             </div>
           </CardContent>
@@ -190,7 +197,7 @@ export default function DashboardPage({ params }: DashboardPageProps) {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">다음 학습</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('dashboard.nextLearning')}</CardTitle>
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -199,12 +206,17 @@ export default function DashboardPage({ params }: DashboardPageProps) {
                 <div className="text-lg font-semibold">{nextModule.moduleTitle}</div>
                 <p className="text-xs text-muted-foreground mt-1">
                   {nextModule.status === 'in_progress'
-                    ? `진행 중 (${nextModule.stepsCompleted}/${nextModule.totalSteps} 단계)`
-                    : '시작하기'}
+                    ? t('dashboard.inProgress', {
+                        completed: nextModule.stepsCompleted,
+                        total: nextModule.totalSteps,
+                      })
+                    : t('dashboard.start')}
                 </p>
                 <Button className="mt-3 w-full" asChild>
                   <Link href={ROUTES.MODULE(nextModule.moduleId)}>
-                    {nextModule.status === 'in_progress' ? '이어서 학습하기' : '학습 시작하기'}
+                    {nextModule.status === 'in_progress'
+                      ? t('dashboard.continueLearning')
+                      : t('dashboard.startLearning')}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
@@ -212,7 +224,7 @@ export default function DashboardPage({ params }: DashboardPageProps) {
             ) : (
               <div className="text-center py-4">
                 <CheckCircle className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                <p className="text-sm font-medium">모든 모듈을 완료했습니다!</p>
+                <p className="text-sm font-medium">{t('dashboard.allModulesCompleted')}</p>
               </div>
             )}
           </CardContent>
@@ -221,9 +233,9 @@ export default function DashboardPage({ params }: DashboardPageProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle>학습 모듈</CardTitle>
+          <CardTitle>{t('dashboard.learningModules')}</CardTitle>
           <CardDescription>
-            5개의 모듈을 순서대로 학습하며 프롬프트 엔지니어링 역량을 키워보세요
+            {t('dashboard.learningModulesDescription', { count: 5 })}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -243,12 +255,15 @@ export default function DashboardPage({ params }: DashboardPageProps) {
                     </div>
                     <div className="text-sm text-muted-foreground">
                       {module.status === 'completed'
-                        ? '완료'
+                        ? t('dashboard.completed')
                         : module.status === 'in_progress'
-                        ? `진행 중 (${module.stepsCompleted}/${module.totalSteps} 단계)`
+                        ? t('dashboard.inProgress', {
+                            completed: module.stepsCompleted,
+                            total: module.totalSteps,
+                          })
                         : index === 0
-                        ? '시작 가능'
-                        : '잠김'}
+                        ? t('dashboard.available')
+                        : t('dashboard.locked')}
                     </div>
                   </div>
                 </div>
@@ -265,10 +280,10 @@ export default function DashboardPage({ params }: DashboardPageProps) {
                   ) : (
                     <Link href={ROUTES.MODULE(module.moduleId)}>
                       {module.status === 'completed'
-                        ? '다시 학습'
+                        ? t('dashboard.review')
                         : module.status === 'in_progress'
-                        ? '이어서'
-                        : '시작'}
+                        ? t('dashboard.continue')
+                        : t('dashboard.start')}
                     </Link>
                   )}
                 </Button>
