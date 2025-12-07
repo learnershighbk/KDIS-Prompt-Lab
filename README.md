@@ -19,6 +19,26 @@ bun dev
 
 `app/page.tsx` 파일을 수정하여 페이지를 편집할 수 있습니다. 파일을 수정하면 자동으로 페이지가 업데이트됩니다.
 
+## 환경 변수 설정
+
+프로젝트 루트에 `.env.local` 파일을 생성하고 다음 환경 변수를 설정하세요:
+
+```env
+# Supabase 프로젝트 URL
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+
+# Supabase Anon Key (공개 키)
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+
+# Supabase Service Role Key (서버 전용 키, 절대 클라이언트에 노출하지 마세요)
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
+```
+
+환경 변수는 Supabase 프로젝트 대시보드의 Settings > API에서 확인할 수 있습니다.
+
+**중요**: 환경 변수가 설정되지 않으면 앱이 시작되지 않습니다. 환경 변수 검증 실패 시 콘솔에 자세한 에러 메시지가 표시됩니다.
+
 ## 기본 포함 라이브러리
 
 - [Next.js](https://nextjs.org)

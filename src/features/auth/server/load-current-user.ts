@@ -12,16 +12,21 @@ const mapUser = (user: User) => ({
 });
 
 export const loadCurrentUser = async (): Promise<CurrentUserSnapshot> => {
-  const supabase = await createSupabaseServerClient();
-  const result = await supabase.auth.getUser();
-  const user = result.data.user;
+  try {
+    const supabase = await createSupabaseServerClient();
+    const result = await supabase.auth.getUser();
+    const user = result.data.user;
 
-  if (user) {
-    return {
-      status: "authenticated",
-      user: mapUser(user),
-    };
+    if (user) {
+      return {
+        status: "authenticated",
+        user: mapUser(user),
+      };
+    }
+
+    return { status: "unauthenticated", user: null };
+  } catch (error) {
+    console.error("loadCurrentUser 에러:", error);
+    return { status: "unauthenticated", user: null };
   }
-
-  return { status: "unauthenticated", user: null };
 };

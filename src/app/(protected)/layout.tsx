@@ -3,6 +3,7 @@
 import { useEffect, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCurrentUser } from "@/features/auth/hooks/useCurrentUser";
+import { DashboardLayout } from "@/components/layouts/dashboard-layout";
 import { LOGIN_PATH } from "@/constants/auth";
 
 const buildRedirectUrl = (pathname: string) => {
@@ -26,9 +27,17 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
     }
   }, [isAuthenticated, isLoading, pathname, router]);
 
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   if (!isAuthenticated) {
     return null;
   }
 
-  return <>{children}</>;
+  return <DashboardLayout>{children}</DashboardLayout>;
 }

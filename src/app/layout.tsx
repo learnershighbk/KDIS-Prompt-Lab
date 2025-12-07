@@ -14,7 +14,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const currentUser = await loadCurrentUser();
+  let currentUser;
+  try {
+    currentUser = await loadCurrentUser();
+  } catch (error) {
+    console.error("RootLayout에서 loadCurrentUser 실패:", error);
+    currentUser = { status: "unauthenticated" as const, user: null };
+  }
 
   return (
     <html lang="ko" suppressHydrationWarning>
