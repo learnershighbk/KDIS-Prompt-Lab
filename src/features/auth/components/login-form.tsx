@@ -14,11 +14,14 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuthStore } from '../stores/auth.store';
 import { ROUTES } from '@/constants/routes';
+import { useTranslation } from '@/features/i18n/hooks/useTranslation';
 
-const loginSchema = z.object({
-  email: z.string().email('유효한 이메일을 입력하세요'),
-  password: z.string().min(6, '비밀번호는 6자 이상이어야 합니다'),
-});
+function createLoginSchema(t: (key: string) => string) {
+  return z.object({
+    email: z.string().email(t('auth.validEmail')),
+    password: z.string().min(6, t('auth.minPassword')),
+  });
+}
 
 type LoginInput = z.infer<typeof loginSchema>;
 
@@ -26,6 +29,10 @@ export function LoginForm() {
   const router = useRouter();
   const login = useAuthStore((s) => s.login);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
+  const loginSchema = createLoginSchema(t);
+
+  type LoginInput = z.infer<typeof loginSchema>;
 
   const {
     register,
@@ -42,26 +49,26 @@ export function LoginForm() {
     if (result.success) {
       router.push(ROUTES.DASHBOARD);
     } else {
-      setError(result.error ?? '로그인에 실패했습니다');
+      setError(result.error ?? t('auth.loginFailed'));
     }
   };
 
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center">로그인</CardTitle>
+        <CardTitle className="text-2xl font-bold text-center">{t('auth.loginTitle')}</CardTitle>
         <CardDescription className="text-center">
-          Prompt Lab에 오신 것을 환영합니다
+          {t('auth.welcomeMessage')}
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">이메일</Label>
+            <Label htmlFor="email">{t('auth.email')}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="name@example.com"
+              placeholder={t('auth.emailPlaceholder')}
               {...register('email')}
               disabled={isSubmitting}
             />
@@ -71,11 +78,11 @@ export function LoginForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">비밀번호</Label>
+            <Label htmlFor="password">{t('auth.password')}</Label>
             <Input
               id="password"
               type="password"
-              placeholder="비밀번호를 입력하세요"
+              placeholder={t('auth.passwordPlaceholder')}
               {...register('password')}
               disabled={isSubmitting}
             />
@@ -96,17 +103,17 @@ export function LoginForm() {
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                로그인 중...
+                {t('auth.loggingIn')}
               </>
             ) : (
-              '로그인'
+              t('auth.login')
             )}
           </Button>
 
           <p className="text-sm text-muted-foreground text-center">
-            계정이 없으신가요?{' '}
+            {t('auth.noAccount')}{' '}
             <Link href={ROUTES.SIGNUP} className="text-primary hover:underline font-medium">
-              회원가입
+              {t('auth.signup')}
             </Link>
           </p>
         </CardFooter>

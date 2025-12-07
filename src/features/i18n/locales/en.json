@@ -1,0 +1,180 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "search": "Search",
+    "filter": "Filter",
+    "user": "User"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "signup": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "fullName": "Full Name",
+    "loginTitle": "Login",
+    "signupTitle": "Sign Up",
+    "welcomeMessage": "Welcome to Prompt Lab",
+    "signupMessage": "Create your Prompt Lab account",
+    "signupComplete": "Sign Up Complete",
+    "signupCompleteMessage": "A verification link has been sent to your email.\nPlease check your email to activate your account.",
+    "goToLogin": "Go to Login",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "loginFailed": "Login failed",
+    "signupFailed": "Sign up failed",
+    "validEmail": "Please enter a valid email",
+    "minPassword": "Password must be at least 6 characters",
+    "minName": "Name must be at least 2 characters",
+    "passwordMismatch": "Passwords do not match",
+    "emailPlaceholder": "name@example.com",
+    "passwordPlaceholder": "Enter your password",
+    "namePlaceholder": "John Doe",
+    "confirmPasswordPlaceholder": "Re-enter your password",
+    "passwordMinPlaceholder": "Enter at least 6 characters",
+    "loggingIn": "Logging in...",
+    "signingUp": "Signing up..."
+  },
+  "navigation": {
+    "modules": "Learning Modules",
+    "resources": "Learning Resources",
+    "dashboard": "Dashboard",
+    "mypage": "My Page",
+    "profile": "Profile",
+    "progress": "Progress",
+    "journals": "Journals",
+    "prompts": "Prompts",
+    "start": "Get Started",
+    "goToDashboard": "Go to Dashboard"
+  },
+  "landing": {
+    "kdiSchoolOnly": "KDI School Exclusive",
+    "heroTitle1": "Don't teach",
+    "heroTitle2": "Let them realize",
+    "heroDescription": "Discover the core principles of prompt engineering through Socratic dialogue. Apply them directly to policy learning and research.",
+    "freeForStudents": "Free for all KDI School students",
+    "startFree": "Start for Free",
+    "alreadyHaveAccount": "Already have an account?",
+    "fiveModules": "5 Practical Modules",
+    "curriculumDescription": "Curriculum designed for policy graduate students",
+    "startNow": "Get Started Now",
+    "ctaDescription": "Build your prompt engineering skills and improve the efficiency of policy research. Socrates is waiting for you.",
+    "startLearning": "Start Learning",
+    "tryNow": "Try it now",
+    "resources": "Resources",
+    "modules": {
+      "module1": {
+        "title": "Good Questions Lead to Good Answers",
+        "technique": "Chain of Thought",
+        "description": "Experience how prompts affect AI response quality"
+      },
+      "module2": {
+        "title": "Effective Literature Review",
+        "technique": "Few-shot Learning",
+        "description": "Write effective prompts for academic literature search, summary, and organization"
+      },
+      "module3": {
+        "title": "Requesting Policy Comparison Analysis",
+        "technique": "Self-Consistency",
+        "description": "Structured prompts for cross-country/policy comparison analysis"
+      },
+      "module4": {
+        "title": "Getting Help with Data Interpretation",
+        "technique": "Persona Setting",
+        "description": "Effectively utilize AI for statistical data interpretation and visualization suggestions"
+      },
+      "module5": {
+        "title": "Getting Support for Policy Document Writing",
+        "technique": "Constraints",
+        "description": "Support for writing practical documents such as briefings, policy memos, and proposals"
+      }
+    },
+    "steps": {
+      "step1": {
+        "title": "Socratic Dialogue",
+        "description": "Discover principles through AI tutor's guided questions"
+      },
+      "step2": {
+        "title": "Prompt Writing",
+        "description": "Write prompts tailored to policy scenarios"
+      },
+      "step3": {
+        "title": "Comparison Lab",
+        "description": "Compare your prompts with improved versions"
+      },
+      "step4": {
+        "title": "Reflection Journal",
+        "description": "Organize what you learned and apply it"
+      }
+    }
+  },
+  "socratic": {
+    "backToModule": "Back to Module",
+    "step1": "Step 1: Socratic Dialogue",
+    "nextStep": "Next Step",
+    "chatTitle": "Conversation with AI Tutor",
+    "exchanges": "exchanges",
+    "thinking": "Thinking...",
+    "errorMessage": "Sorry, an error occurred while generating a response. Please try again.",
+    "error": "Error",
+    "complete": "Socratic dialogue completed!",
+    "completeMessage": "Click the 'Next Step' button in the top right to proceed to prompt writing.",
+    "goToPromptWriting": "Go to Prompt Writing",
+    "answerPlaceholder": "Enter your answer...",
+    "hint": "Hint",
+    "showHint": "Show Hint",
+    "anotherHint": "Show Another Hint",
+    "hintDescription": "If you're having trouble answering, check the hints.",
+    "learningGuide": "Learning Progress Guide",
+    "learningDescription": "You can understand the core concepts by having about {count} exchanges with the AI tutor.",
+    "canProceed": "If you've had enough conversation, you can proceed by clicking the 'Next Step' button!",
+    "initialQuestions": {
+      "module1": "Hello! 👋 Today we'll explore \"Good Questions Lead to Good Answers\" together.\n\nBefore we start, I have a question: When asking questions to AI, why do you think specific questions are important?\n\nFeel free to answer as you think. There's no right answer! 🙂",
+      "module2": "Hello! 👋 Today we'll talk about literature review using AI.\n\nFirst, a question: When reading and summarizing literature, how should you ask AI for help?\n\nIf you've tried it before, that's great too!",
+      "module3": "Hello! 👋 Today's topic is policy comparison analysis.\n\nLet me ask you right away: If comparing policies between two countries, what criteria would be fair for comparison?\n\nFor example, think about comparing birth policies between Korea and Japan.",
+      "module4": "Hello! 👋 Today we'll explore data interpretation together.\n\nI have a question: When looking at and analyzing data, where do you think AI's help is most needed?\n\nFeel free to share your personal experience or thoughts.",
+      "module5": "Hello! 👋 Today we'll talk about policy document writing.\n\nFirst, a question: What is the most difficult part when writing policy documents?\n\nStructure, logical flow, sentence refinement... anything is fine."
+    },
+    "hints": {
+      "module1": [
+        "Think about the difference between vague questions and specific questions",
+        "What information does AI need to understand context?",
+        "Think about the components of a good question"
+      ],
+      "module2": [
+        "Think about how to identify the core arguments of literature",
+        "What criteria are needed when comparing multiple pieces of literature?",
+        "Consider how to evaluate the reliability of literature"
+      ],
+      "module3": [
+        "Think about indicators for measuring policy effectiveness",
+        "Consider perspectives of various stakeholders",
+        "Think about systematic methods for analyzing policy pros and cons"
+      ],
+      "module4": [
+        "Think about ways to find patterns and trends in data",
+        "Consider the difference between statistical significance and practical significance",
+        "Think about the importance of data visualization"
+      ],
+      "module5": [
+        "Think about the structure and logical flow of policy documents",
+        "Think about writing methods considering the target audience",
+        "Consider ways to make compelling arguments"
+      ]
+    }
+  }
+}
+

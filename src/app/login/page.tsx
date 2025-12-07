@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
 import { useCurrentUser } from "@/features/auth/hooks/useCurrentUser";
@@ -100,92 +99,79 @@ export default function LoginPage({ params }: LoginPageProps) {
         </p>
       </header>
 
-      <div className="grid w-full gap-8 md:grid-cols-2">
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col gap-5 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
-        >
-          <label className="flex flex-col gap-2 text-sm text-slate-700">
-            <span className="flex items-center gap-2 font-medium">
-              <User className="h-4 w-4" />
-              학번 (사번)
-            </span>
-            <input
-              type="text"
-              name="studentId"
-              inputMode="numeric"
-              pattern="\d*"
-              autoComplete="username"
-              placeholder="9자리 숫자 입력"
-              required
-              value={formState.studentId}
-              onChange={handleChange}
-              className="rounded-lg border border-slate-300 px-4 py-3 text-lg tracking-wider focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-            />
-            <span className="text-xs text-slate-400">
-              {formState.studentId.length}/9자리
-            </span>
-          </label>
-
-          <label className="flex flex-col gap-2 text-sm text-slate-700">
-            <span className="flex items-center gap-2 font-medium">
-              <KeyRound className="h-4 w-4" />
-              PIN 번호
-            </span>
-            <input
-              type="password"
-              name="pin"
-              inputMode="numeric"
-              pattern="\d*"
-              autoComplete="current-password"
-              placeholder="4자리 숫자 입력"
-              required
-              value={formState.pin}
-              onChange={handleChange}
-              className="rounded-lg border border-slate-300 px-4 py-3 text-lg tracking-[0.5em] text-center focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-            />
-            <span className="text-xs text-slate-400">
-              {formState.pin.length}/4자리
-            </span>
-          </label>
-
-          {errorMessage && (
-            <p className="rounded-lg bg-rose-50 px-4 py-2 text-sm text-rose-600">
-              {errorMessage}
-            </p>
-          )}
-
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="mt-2 flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-slate-400"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                로그인 중...
-              </>
-            ) : (
-              "로그인"
-            )}
-          </button>
-
-          <p className="mt-2 rounded-lg bg-slate-50 px-4 py-3 text-xs text-slate-500">
-            💡 <strong>처음 오셨나요?</strong> 학번과 원하시는 PIN을 입력하면 자동으로 계정이 생성됩니다.
-          </p>
-        </form>
-
-        <figure className="hidden overflow-hidden rounded-xl border border-slate-200 md:block">
-          <Image
-            src="https://picsum.photos/seed/promptlab-login/640/640"
-            alt="로그인"
-            width={640}
-            height={640}
-            className="h-full w-full object-cover"
-            priority
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-md flex flex-col gap-5 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
+      >
+        <label className="flex flex-col gap-2 text-sm text-slate-700">
+          <span className="flex items-center gap-2 font-medium">
+            <User className="h-4 w-4" />
+            학번 (사번)
+          </span>
+          <input
+            type="text"
+            name="studentId"
+            inputMode="numeric"
+            pattern="\d*"
+            autoComplete="username"
+            placeholder="9자리 숫자 입력"
+            required
+            value={formState.studentId}
+            onChange={handleChange}
+            className="rounded-lg border border-slate-300 px-4 py-3 text-lg tracking-wider focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
           />
-        </figure>
-      </div>
+          <span className="text-xs text-slate-400">
+            {formState.studentId.length}/9자리
+          </span>
+        </label>
+
+        <label className="flex flex-col gap-2 text-sm text-slate-700">
+          <span className="flex items-center gap-2 font-medium">
+            <KeyRound className="h-4 w-4" />
+            PIN 번호
+          </span>
+          <input
+            type="password"
+            name="pin"
+            inputMode="numeric"
+            pattern="\d*"
+            autoComplete="current-password"
+            placeholder="4자리 숫자 입력"
+            required
+            value={formState.pin}
+            onChange={handleChange}
+            className="rounded-lg border border-slate-300 px-4 py-3 text-lg tracking-[0.5em] text-center focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+          />
+          <span className="text-xs text-slate-400">
+            {formState.pin.length}/4자리
+          </span>
+        </label>
+
+        {errorMessage && (
+          <p className="rounded-lg bg-rose-50 px-4 py-2 text-sm text-rose-600">
+            {errorMessage}
+          </p>
+        )}
+
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="mt-2 flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-slate-400"
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              로그인 중...
+            </>
+          ) : (
+            "로그인"
+          )}
+        </button>
+
+        <p className="mt-2 rounded-lg bg-slate-50 px-4 py-3 text-xs text-slate-500">
+          💡 <strong>처음 오셨나요?</strong> 학번과 원하시는 PIN을 입력하면 자동으로 계정이 생성됩니다.
+        </p>
+      </form>
     </div>
   );
 }

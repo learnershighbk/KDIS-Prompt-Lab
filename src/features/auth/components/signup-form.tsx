@@ -14,24 +14,29 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuthStore } from '../stores/auth.store';
 import { ROUTES } from '@/constants/routes';
+import { useTranslation } from '@/features/i18n/hooks/useTranslation';
 
-const signupSchema = z.object({
-  fullName: z.string().min(2, '이름은 2자 이상이어야 합니다'),
-  email: z.string().email('유효한 이메일을 입력하세요'),
-  password: z.string().min(6, '비밀번호는 6자 이상이어야 합니다'),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: '비밀번호가 일치하지 않습니다',
-  path: ['confirmPassword'],
-});
-
-type SignupInput = z.infer<typeof signupSchema>;
+function createSignupSchema(t: (key: string) => string) {
+  return z.object({
+    fullName: z.string().min(2, t('auth.minName')),
+    email: z.string().email(t('auth.validEmail')),
+    password: z.string().min(6, t('auth.minPassword')),
+    confirmPassword: z.string(),
+  }).refine((data) => data.password === data.confirmPassword, {
+    message: t('auth.passwordMismatch'),
+    path: ['confirmPassword'],
+  });
+}
 
 export function SignupForm() {
   const router = useRouter();
   const signup = useAuthStore((s) => s.signup);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const { t } = useTranslation();
+  const signupSchema = createSignupSchema(t);
+
+  type SignupInput = z.infer<typeof signupSchema>;
 
   const {
     register,
@@ -48,7 +53,7 @@ export function SignupForm() {
     if (result.success) {
       setSuccess(true);
     } else {
-      setError(result.error ?? '회원가입에 실패했습니다');
+      setError(result.error ?? t('auth.signupFailed'));
     }
   };
 
@@ -59,10 +64,9 @@ export function SignupForm() {
           <div className="flex justify-center mb-4">
             <CheckCircle className="h-16 w-16 text-green-500" />
           </div>
-          <CardTitle className="text-2xl font-bold text-center">회원가입 완료</CardTitle>
-          <CardDescription className="text-center">
-            이메일로 인증 링크가 발송되었습니다.<br />
-            이메일을 확인하여 계정을 활성화해주세요.
+          <CardTitle className="text-2xl font-bold text-center">{t('auth.signupComplete')}</CardTitle>
+          <CardDescription className="text-center whitespace-pre-line">
+            {t('auth.signupCompleteMessage')}
           </CardDescription>
         </CardHeader>
         <CardFooter>
@@ -70,7 +74,7 @@ export function SignupForm() {
             className="w-full"
             onClick={() => router.push(ROUTES.LOGIN)}
           >
-            로그인 페이지로 이동
+            {t('auth.goToLogin')}
           </Button>
         </CardFooter>
       </Card>
@@ -80,19 +84,19 @@ export function SignupForm() {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center">회원가입</CardTitle>
+        <CardTitle className="text-2xl font-bold text-center">{t('auth.signupTitle')}</CardTitle>
         <CardDescription className="text-center">
-          Prompt Lab 계정을 생성하세요
+          {t('auth.signupMessage')}
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="fullName">이름</Label>
+            <Label htmlFor="fullName">{t('auth.fullName')}</Label>
             <Input
               id="fullName"
               type="text"
-              placeholder="홍길동"
+              placeholder={t('auth.namePlaceholder')}
               {...register('fullName')}
               disabled={isSubmitting}
             />
@@ -102,11 +106,11 @@ export function SignupForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">이메일</Label>
+            <Label htmlFor="email">{t('auth.email')}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="name@example.com"
+              placeholder={t('auth.emailPlaceholder')}
               {...register('email')}
               disabled={isSubmitting}
             />
@@ -116,11 +120,11 @@ export function SignupForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">비밀번호</Label>
+            <Label htmlFor="password">{t('auth.password')}</Label>
             <Input
               id="password"
               type="password"
-              placeholder="6자 이상 입력하세요"
+              placeholder={t('auth.passwordMinPlaceholder')}
               {...register('password')}
               disabled={isSubmitting}
             />
@@ -130,11 +134,11 @@ export function SignupForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">비밀번호 확인</Label>
+            <Label htmlFor="confirmPassword">{t('auth.confirmPassword')}</Label>
             <Input
               id="confirmPassword"
               type="password"
-              placeholder="비밀번호를 다시 입력하세요"
+              placeholder={t('auth.confirmPasswordPlaceholder')}
               {...register('confirmPassword')}
               disabled={isSubmitting}
             />
@@ -155,17 +159,17 @@ export function SignupForm() {
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                가입 중...
+                {t('auth.signingUp')}
               </>
             ) : (
-              '회원가입'
+              t('auth.signup')
             )}
           </Button>
 
           <p className="text-sm text-muted-foreground text-center">
-            이미 계정이 있으신가요?{' '}
+            {t('auth.hasAccount')}{' '}
             <Link href={ROUTES.LOGIN} className="text-primary hover:underline font-medium">
-              로그인
+              {t('auth.login')}
             </Link>
           </p>
         </CardFooter>

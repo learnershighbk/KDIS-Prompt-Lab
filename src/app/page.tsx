@@ -14,69 +14,71 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { useCurrentUser } from "@/features/auth/hooks/useCurrentUser";
-
-const modules = [
-  {
-    id: 1,
-    title: "좋은 질문이 좋은 답을 만든다",
-    technique: "Chain of Thought",
-    description: "프롬프트가 AI 응답 품질에 미치는 영향을 체험적으로 이해",
-  },
-  {
-    id: 2,
-    title: "문헌 리뷰 효과적으로 하기",
-    technique: "Few-shot Learning",
-    description: "학술 문헌 검색, 요약, 정리에 효과적인 프롬프트 작성",
-  },
-  {
-    id: 3,
-    title: "정책 비교 분석 요청하기",
-    technique: "Self-Consistency",
-    description: "국가 간/정책 간 비교 분석을 위한 구조화된 프롬프트",
-  },
-  {
-    id: 4,
-    title: "데이터 해석 도움받기",
-    technique: "Persona Setting",
-    description: "통계 데이터 해석, 시각화 제안에 AI를 효과적으로 활용",
-  },
-  {
-    id: 5,
-    title: "정책 문서 작성 지원받기",
-    technique: "Constraints",
-    description: "브리핑, 정책 메모, 제안서 등 실무 문서 작성 지원",
-  },
-];
-
-const steps = [
-  {
-    number: "01",
-    title: "소크라테스 대화",
-    description: "AI 튜터의 유도 질문으로 원리를 발견",
-    icon: MessageCircle,
-  },
-  {
-    number: "02",
-    title: "프롬프트 작성",
-    description: "정책 시나리오에 맞는 프롬프트 작성",
-    icon: PenTool,
-  },
-  {
-    number: "03",
-    title: "비교 실험실",
-    description: "내 프롬프트와 개선안 결과 비교",
-    icon: GitCompare,
-  },
-  {
-    number: "04",
-    title: "성찰 저널",
-    description: "배운 점 정리 및 적용",
-    icon: BookOpen,
-  },
-];
+import { useTranslation } from "@/features/i18n/hooks/useTranslation";
 
 export default function LandingPage() {
   const { isAuthenticated, isLoading } = useCurrentUser();
+  const { t } = useTranslation();
+
+  const modules = useMemo(() => [
+    {
+      id: 1,
+      title: t('landing.modules.module1.title'),
+      technique: 'Chain of Thought',
+      description: t('landing.modules.module1.description'),
+    },
+    {
+      id: 2,
+      title: t('landing.modules.module2.title'),
+      technique: 'Few-shot Learning',
+      description: t('landing.modules.module2.description'),
+    },
+    {
+      id: 3,
+      title: t('landing.modules.module3.title'),
+      technique: 'Self-Consistency',
+      description: t('landing.modules.module3.description'),
+    },
+    {
+      id: 4,
+      title: t('landing.modules.module4.title'),
+      technique: 'Persona Setting',
+      description: t('landing.modules.module4.description'),
+    },
+    {
+      id: 5,
+      title: t('landing.modules.module5.title'),
+      technique: 'Constraints',
+      description: t('landing.modules.module5.description'),
+    },
+  ], [t]);
+
+  const steps = useMemo(() => [
+    {
+      number: "01",
+      title: t('landing.steps.step1.title'),
+      description: t('landing.steps.step1.description'),
+      icon: MessageCircle,
+    },
+    {
+      number: "02",
+      title: t('landing.steps.step2.title'),
+      description: t('landing.steps.step2.description'),
+      icon: PenTool,
+    },
+    {
+      number: "03",
+      title: t('landing.steps.step3.title'),
+      description: t('landing.steps.step3.description'),
+      icon: GitCompare,
+    },
+    {
+      number: "04",
+      title: t('landing.steps.step4.title'),
+      description: t('landing.steps.step4.description'),
+      icon: BookOpen,
+    },
+  ], [t]);
 
   const ctaButton = useMemo(() => {
     if (isLoading) {
@@ -86,7 +88,7 @@ export default function LandingPage() {
           className="px-8 py-4 text-base font-medium rounded-full transition-all"
           style={{ backgroundColor: "#D9D8DA", color: "#666" }}
         >
-          로딩 중...
+          {t('common.loading')}
         </button>
       );
     }
@@ -98,7 +100,7 @@ export default function LandingPage() {
             className="group px-8 py-4 text-base font-medium text-white rounded-full transition-all hover:scale-105 flex items-center gap-2"
             style={{ backgroundColor: "#292727" }}
           >
-            대시보드로 이동
+            {t('navigation.goToDashboard')}
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </button>
         </Link>
@@ -112,7 +114,7 @@ export default function LandingPage() {
             className="group px-8 py-4 text-base font-medium text-white rounded-full transition-all hover:scale-105 flex items-center gap-2"
             style={{ backgroundColor: "#292727" }}
           >
-            무료로 시작하기
+            {t('landing.startFree')}
             <Sparkles className="w-4 h-4" />
           </button>
         </Link>
@@ -125,12 +127,12 @@ export default function LandingPage() {
               border: "1px solid rgba(0,0,0,0.15)",
             }}
           >
-            로그인
+            {t('auth.login')}
           </button>
         </Link>
       </div>
     );
-  }, [isAuthenticated, isLoading]);
+  }, [isAuthenticated, isLoading, t]);
 
   return (
     <main className="min-h-screen w-full" style={{ backgroundColor: "#F7F5F2" }}>
@@ -159,14 +161,14 @@ export default function LandingPage() {
               className="text-sm font-medium transition-opacity hover:opacity-60"
               style={{ color: "#292727" }}
             >
-              학습 모듈
+              {t('navigation.modules')}
             </Link>
             <Link
               href="/resources"
               className="text-sm font-medium transition-opacity hover:opacity-60"
               style={{ color: "#292727" }}
             >
-              리소스
+              {t('landing.resources')}
             </Link>
           </div>
         </div>
@@ -178,7 +180,7 @@ export default function LandingPage() {
                 className="px-5 py-2.5 text-sm font-medium text-white rounded-full transition-all hover:scale-105"
                 style={{ backgroundColor: "#292727" }}
               >
-                대시보드
+                {t('navigation.dashboard')}
               </button>
             </Link>
           ) : (
@@ -188,14 +190,14 @@ export default function LandingPage() {
                 className="hidden sm:block text-sm font-medium transition-opacity hover:opacity-60"
                 style={{ color: "#292727" }}
               >
-                로그인
+                {t('auth.login')}
               </Link>
               <Link href="/signup">
                 <button
                   className="px-5 py-2.5 text-sm font-medium text-white rounded-full transition-all hover:scale-105"
                   style={{ backgroundColor: "#292727" }}
                 >
-                  시작하기
+                  {t('navigation.start')}
                 </button>
               </Link>
             </>
@@ -232,24 +234,23 @@ export default function LandingPage() {
                 }}
               >
                 <GraduationCap className="w-4 h-4" />
-                KDI School 전용
+                {t('landing.kdiSchoolOnly')}
               </div>
 
               <h1
                 className="text-5xl lg:text-7xl leading-[1.1] mb-8 font-serif"
                 style={{ color: "#292727" }}
               >
-                <span className="italic">가르치지 않고</span>
+                <span className="italic">{t('landing.heroTitle1')}</span>
                 <br />
-                <span className="italic">깨닫게 한다</span>
+                <span className="italic">{t('landing.heroTitle2')}</span>
               </h1>
 
               <p
                 className="text-lg lg:text-xl leading-relaxed mb-10 max-w-lg font-sans"
                 style={{ color: "#666" }}
               >
-                소크라테스식 대화를 통해 프롬프트 엔지니어링의 핵심 원리를
-                스스로 체득하세요. 정책 학습과 리서치에 바로 적용할 수 있습니다.
+                {t('landing.heroDescription')}
               </p>
 
               {ctaButton}
@@ -258,7 +259,7 @@ export default function LandingPage() {
                 className="mt-6 text-sm font-sans"
                 style={{ color: "#999" }}
               >
-                KDI School 학생이라면 누구나 무료
+                {t('landing.freeForStudents')}
               </p>
             </motion.div>
 
@@ -331,13 +332,13 @@ export default function LandingPage() {
               className="text-4xl lg:text-5xl font-serif italic mb-4"
               style={{ color: "#292727" }}
             >
-              5개의 실전 모듈
+              {t('landing.fiveModules')}
             </h2>
             <p
               className="text-lg font-sans"
               style={{ color: "#666" }}
             >
-              정책대학원생을 위해 설계된 커리큘럼
+              {t('landing.curriculumDescription')}
             </p>
           </motion.div>
 
@@ -422,14 +423,13 @@ export default function LandingPage() {
               className="text-4xl lg:text-5xl font-serif italic mb-6"
               style={{ color: "#F7F5F2" }}
             >
-              지금 시작하세요
+              {t('landing.startNow')}
             </h2>
             <p
               className="text-lg mb-10 max-w-2xl mx-auto font-sans"
               style={{ color: "rgba(247, 245, 242, 0.7)" }}
             >
-              프롬프트 엔지니어링 역량을 키우고 정책 연구의 효율을 높여보세요.
-              소크라테스 선생님이 기다리고 있습니다.
+              {t('landing.ctaDescription')}
             </p>
 
             {isAuthenticated ? (
@@ -438,7 +438,7 @@ export default function LandingPage() {
                   className="group px-10 py-5 text-base font-medium rounded-full transition-all hover:scale-105 flex items-center gap-2 mx-auto font-sans"
                   style={{ backgroundColor: "#F7F5F2", color: "#292727" }}
                 >
-                  대시보드로 이동
+                  {t('navigation.goToDashboard')}
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </button>
               </Link>
@@ -449,7 +449,7 @@ export default function LandingPage() {
                     className="group px-10 py-5 text-base font-medium rounded-full transition-all hover:scale-105 flex items-center gap-2 font-sans"
                     style={{ backgroundColor: "#F7F5F2", color: "#292727" }}
                   >
-                    무료로 시작하기
+                    {t('landing.startFree')}
                     <Sparkles className="w-4 h-4" />
                   </button>
                 </Link>
@@ -462,7 +462,7 @@ export default function LandingPage() {
                       border: "1px solid rgba(247, 245, 242, 0.3)",
                     }}
                   >
-                    이미 계정이 있어요
+                    {t('landing.alreadyHaveAccount')}
                   </button>
                 </Link>
               </div>
@@ -515,10 +515,10 @@ export default function LandingPage() {
           </div>
           <div className="flex flex-col">
             <span className="text-sm font-medium font-sans" style={{ color: "#292727" }}>
-              학습 시작하기
+              {t('landing.startLearning')}
             </span>
             <span className="text-xs font-sans" style={{ color: "#999" }}>
-              지금 바로 체험해보세요
+              {t('landing.tryNow')}
             </span>
           </div>
           <ArrowRight className="w-5 h-5 ml-2" style={{ color: "#292727" }} />

@@ -2,11 +2,19 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { GraduationCap, BookOpen, Library, LogOut, Menu, User2 } from 'lucide-react';
+import { GraduationCap, BookOpen, Library, LogOut, Menu, User2, Languages } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/features/auth/stores/auth.store';
 import { ROUTES } from '@/constants/routes';
+import { useTranslation } from '@/features/i18n/hooks/useTranslation';
+import { useLocaleStore } from '@/features/i18n/stores/locale.store';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -16,10 +24,12 @@ export function Header({ onMenuClick }: HeaderProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout, isAuthenticated } = useAuthStore();
+  const { t } = useTranslation();
+  const { locale, setLocale } = useLocaleStore();
 
   const navItems = [
-    { href: ROUTES.MODULES, label: '학습 모듈', icon: BookOpen },
-    { href: ROUTES.RESOURCES, label: '학습 리소스', icon: Library },
+    { href: ROUTES.MODULES, label: t('navigation.modules'), icon: BookOpen },
+    { href: ROUTES.RESOURCES, label: t('navigation.resources'), icon: Library },
   ];
 
   const handleLogout = async () => {
@@ -27,7 +37,7 @@ export function Header({ onMenuClick }: HeaderProps) {
     router.push(ROUTES.HOME);
   };
 
-  const displayId = user?.studentId ?? user?.email?.split('@')[0] ?? '사용자';
+  const displayId = user?.studentId ?? user?.email?.split('@')[0] ?? t('common.user');
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -72,6 +82,22 @@ export function Header({ onMenuClick }: HeaderProps) {
         </div>
 
         <div className="flex items-center gap-3">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-9 w-9">
+                <Languages className="h-4 w-4" />
+                <span className="sr-only">Change language</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setLocale('ko')} className={locale === 'ko' ? 'bg-accent' : ''}>
+                한국어
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setLocale('en')} className={locale === 'en' ? 'bg-accent' : ''}>
+                English
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           {isAuthenticated ? (
             <>
               <div className="flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-2">
@@ -87,12 +113,12 @@ export function Header({ onMenuClick }: HeaderProps) {
                 className="flex items-center gap-2 text-slate-600 hover:text-destructive hover:border-destructive"
               >
                 <LogOut className="h-4 w-4" />
-                <span className="hidden sm:inline">로그아웃</span>
+                <span className="hidden sm:inline">{t('auth.logout')}</span>
               </Button>
             </>
           ) : (
             <Button asChild>
-              <Link href={ROUTES.LOGIN}>로그인</Link>
+              <Link href={ROUTES.LOGIN}>{t('auth.login')}</Link>
             </Button>
           )}
         </div>

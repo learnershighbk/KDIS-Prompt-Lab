@@ -1,0 +1,180 @@
+{
+  "common": {
+    "loading": "로딩 중...",
+    "error": "오류가 발생했습니다",
+    "success": "성공",
+    "cancel": "취소",
+    "confirm": "확인",
+    "save": "저장",
+    "delete": "삭제",
+    "edit": "수정",
+    "close": "닫기",
+    "back": "뒤로",
+    "next": "다음",
+    "previous": "이전",
+    "submit": "제출",
+    "search": "검색",
+    "filter": "필터",
+    "user": "사용자"
+  },
+  "auth": {
+    "login": "로그인",
+    "logout": "로그아웃",
+    "signup": "회원가입",
+    "email": "이메일",
+    "password": "비밀번호",
+    "confirmPassword": "비밀번호 확인",
+    "fullName": "이름",
+    "loginTitle": "로그인",
+    "signupTitle": "회원가입",
+    "welcomeMessage": "Prompt Lab에 오신 것을 환영합니다",
+    "signupMessage": "Prompt Lab 계정을 생성하세요",
+    "signupComplete": "회원가입 완료",
+    "signupCompleteMessage": "이메일로 인증 링크가 발송되었습니다.\n이메일을 확인하여 계정을 활성화해주세요.",
+    "goToLogin": "로그인 페이지로 이동",
+    "noAccount": "계정이 없으신가요?",
+    "hasAccount": "이미 계정이 있으신가요?",
+    "loginFailed": "로그인에 실패했습니다",
+    "signupFailed": "회원가입에 실패했습니다",
+    "validEmail": "유효한 이메일을 입력하세요",
+    "minPassword": "비밀번호는 6자 이상이어야 합니다",
+    "minName": "이름은 2자 이상이어야 합니다",
+    "passwordMismatch": "비밀번호가 일치하지 않습니다",
+    "emailPlaceholder": "name@example.com",
+    "passwordPlaceholder": "비밀번호를 입력하세요",
+    "namePlaceholder": "홍길동",
+    "confirmPasswordPlaceholder": "비밀번호를 다시 입력하세요",
+    "passwordMinPlaceholder": "6자 이상 입력하세요",
+    "loggingIn": "로그인 중...",
+    "signingUp": "가입 중..."
+  },
+  "navigation": {
+    "modules": "학습 모듈",
+    "resources": "학습 리소스",
+    "dashboard": "대시보드",
+    "mypage": "마이페이지",
+    "profile": "프로필",
+    "progress": "진행 상황",
+    "journals": "저널",
+    "prompts": "프롬프트",
+    "start": "시작하기",
+    "goToDashboard": "대시보드로 이동"
+  },
+  "landing": {
+    "kdiSchoolOnly": "KDI School 전용",
+    "heroTitle1": "가르치지 않고",
+    "heroTitle2": "깨닫게 한다",
+    "heroDescription": "소크라테스식 대화를 통해 프롬프트 엔지니어링의 핵심 원리를 스스로 체득하세요. 정책 학습과 리서치에 바로 적용할 수 있습니다.",
+    "freeForStudents": "KDI School 학생이라면 누구나 무료",
+    "startFree": "무료로 시작하기",
+    "alreadyHaveAccount": "이미 계정이 있어요",
+    "fiveModules": "5개의 실전 모듈",
+    "curriculumDescription": "정책대학원생을 위해 설계된 커리큘럼",
+    "startNow": "지금 시작하세요",
+    "ctaDescription": "프롬프트 엔지니어링 역량을 키우고 정책 연구의 효율을 높여보세요. 소크라테스 선생님이 기다리고 있습니다.",
+    "startLearning": "학습 시작하기",
+    "tryNow": "지금 바로 체험해보세요",
+    "resources": "리소스",
+    "modules": {
+      "module1": {
+        "title": "좋은 질문이 좋은 답을 만든다",
+        "technique": "Chain of Thought",
+        "description": "프롬프트가 AI 응답 품질에 미치는 영향을 체험적으로 이해"
+      },
+      "module2": {
+        "title": "문헌 리뷰 효과적으로 하기",
+        "technique": "Few-shot Learning",
+        "description": "학술 문헌 검색, 요약, 정리에 효과적인 프롬프트 작성"
+      },
+      "module3": {
+        "title": "정책 비교 분석 요청하기",
+        "technique": "Self-Consistency",
+        "description": "국가 간/정책 간 비교 분석을 위한 구조화된 프롬프트"
+      },
+      "module4": {
+        "title": "데이터 해석 도움받기",
+        "technique": "Persona Setting",
+        "description": "통계 데이터 해석, 시각화 제안에 AI를 효과적으로 활용"
+      },
+      "module5": {
+        "title": "정책 문서 작성 지원받기",
+        "technique": "Constraints",
+        "description": "브리핑, 정책 메모, 제안서 등 실무 문서 작성 지원"
+      }
+    },
+    "steps": {
+      "step1": {
+        "title": "소크라테스 대화",
+        "description": "AI 튜터의 유도 질문으로 원리를 발견"
+      },
+      "step2": {
+        "title": "프롬프트 작성",
+        "description": "정책 시나리오에 맞는 프롬프트 작성"
+      },
+      "step3": {
+        "title": "비교 실험실",
+        "description": "내 프롬프트와 개선안 결과 비교"
+      },
+      "step4": {
+        "title": "성찰 저널",
+        "description": "배운 점 정리 및 적용"
+      }
+    }
+  },
+  "socratic": {
+    "backToModule": "모듈로 돌아가기",
+    "step1": "Step 1: 소크라테스 대화",
+    "nextStep": "다음 단계로",
+    "chatTitle": "AI 튜터와의 대화",
+    "exchanges": "대화",
+    "thinking": "생각하는 중...",
+    "errorMessage": "죄송합니다, 응답 생성 중 오류가 발생했습니다. 다시 시도해주세요.",
+    "error": "오류",
+    "complete": "소크라테스 대화를 완료했습니다!",
+    "completeMessage": "오른쪽 상단의 '다음 단계로' 버튼을 클릭하여 프롬프트 작성으로 이동하세요.",
+    "goToPromptWriting": "프롬프트 작성으로 이동",
+    "answerPlaceholder": "답변을 입력하세요...",
+    "hint": "힌트",
+    "showHint": "힌트 보기",
+    "anotherHint": "다른 힌트 보기",
+    "hintDescription": "답변이 어려우시다면 힌트를 확인해보세요.",
+    "learningGuide": "학습 진행 안내",
+    "learningDescription": "AI 튜터와 {count}회 정도 대화하면 핵심 개념을 이해할 수 있어요.",
+    "canProceed": "충분히 대화했다면 '다음 단계로' 버튼을 눌러 진행할 수 있어요!",
+    "initialQuestions": {
+      "module1": "안녕하세요! 👋 오늘은 \"좋은 질문이 좋은 답을 만든다\"에 대해 함께 탐구해볼 거예요.\n\n시작하기 전에 한 가지 질문을 드릴게요: AI에게 질문할 때, 왜 구체적인 질문이 중요하다고 생각하시나요?\n\n편하게 생각나는 대로 답해주세요. 정답은 없어요! 🙂",
+      "module2": "안녕하세요! 👋 오늘은 AI를 활용한 문헌 리뷰에 대해 이야기해볼게요.\n\n먼저 질문 하나: 문헌을 읽고 요약할 때, AI에게 어떤 식으로 도움을 요청하면 좋을까요?\n\n혹시 이미 시도해보신 경험이 있다면 그것도 좋아요!",
+      "module3": "안녕하세요! 👋 오늘의 주제는 정책 비교 분석이에요.\n\n바로 질문 드릴게요: 두 나라의 정책을 비교한다면, 어떤 기준으로 비교하는 것이 공정할까요?\n\n예를 들어, 한국과 일본의 출산 정책을 비교한다고 생각해보세요.",
+      "module4": "안녕하세요! 👋 오늘은 데이터 해석에 대해 함께 탐구해볼 거예요.\n\n질문 드릴게요: 데이터를 보고 분석할 때, AI의 도움이 가장 필요한 부분은 어디라고 생각하시나요?\n\n개인적인 경험이나 생각을 자유롭게 말씀해주세요.",
+      "module5": "안녕하세요! 👋 오늘은 정책 문서 작성에 대해 이야기해볼게요.\n\n먼저 한 가지 질문: 정책 문서를 작성할 때 가장 어려운 부분은 무엇인가요?\n\n구조 잡기, 논리 전개, 문장 다듬기... 어떤 것이든 좋아요."
+    },
+    "hints": {
+      "module1": [
+        "모호한 질문 vs 구체적인 질문의 차이를 생각해보세요",
+        "AI가 맥락을 이해하려면 어떤 정보가 필요할까요?",
+        "좋은 질문의 구성 요소를 떠올려보세요"
+      ],
+      "module2": [
+        "문헌의 핵심 논점을 파악하는 방법을 생각해보세요",
+        "여러 문헌을 비교할 때 어떤 기준이 필요할까요?",
+        "문헌의 신뢰성을 평가하는 방법을 고려해보세요"
+      ],
+      "module3": [
+        "정책의 효과성을 측정하는 지표를 생각해보세요",
+        "다양한 이해관계자의 관점을 고려해보세요",
+        "정책의 장단점을 체계적으로 분석하는 방법을 떠올려보세요"
+      ],
+      "module4": [
+        "데이터의 패턴과 트렌드를 찾는 방법을 생각해보세요",
+        "통계적 의미와 실질적 의미의 차이를 고려해보세요",
+        "데이터 시각화의 중요성을 떠올려보세요"
+      ],
+      "module5": [
+        "정책 문서의 구조와 논리적 흐름을 생각해보세요",
+        "대상 독자를 고려한 글쓰기 방법을 떠올려보세요",
+        "설득력 있는 주장을 펼치는 방법을 고려해보세요"
+      ]
+    }
+  }
+}
+

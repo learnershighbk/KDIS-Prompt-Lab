@@ -3,10 +3,11 @@ import "./globals.css";
 import Providers from "./providers";
 import { loadCurrentUser } from "@/features/auth/server/load-current-user";
 import { CurrentUserProvider } from "@/features/auth/context/current-user-context";
+import { LocaleProvider } from '@/components/layouts/locale-provider';
 
 export const metadata: Metadata = {
   title: "Prompt Lab - KDI School",
-  description: "소크라테스식 프롬프트 엔지니어링 학습 플랫폼",
+  description: "Socratic prompt engineering learning platform",
 };
 
 export default async function RootLayout({
@@ -34,9 +35,11 @@ export default async function RootLayout({
       </head>
       <body className="antialiased">
         <Providers>
-          <CurrentUserProvider initialState={currentUser}>
-            {children}
-          </CurrentUserProvider>
+          <LocaleProvider>
+            <CurrentUserProvider initialState={currentUser}>
+              {children}
+            </CurrentUserProvider>
+          </LocaleProvider>
         </Providers>
       </body>
     </html>
