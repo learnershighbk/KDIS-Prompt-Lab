@@ -15,6 +15,30 @@ export class AuthService {
     return `${PIN_PREFIX}${pin}`;
   }
 
+  private async createUserProfile(userId: string, studentId: string): Promise<void> {
+    const { error: profileError } = await this.supabase
+      .from('profiles')
+      .upsert({
+        id: userId,
+        student_id: studentId,
+      }, { onConflict: 'id' });
+
+    if (profileError) {
+      console.error('Failed to create profile:', profileError);
+    }
+
+    const { error: roleError } = await this.supabase
+      .from('user_roles')
+      .upsert({
+        user_id: userId,
+        role: 'student',
+      }, { onConflict: 'user_id,role' });
+
+    if (roleError) {
+      console.error('Failed to create user role:', roleError);
+    }
+  }
+
   async signup(data: SignupRequest) {
     const { data: authData, error } = await this.supabase.auth.signUp({
       email: data.email,
@@ -154,21 +178,42 @@ export class AuthService {
     }
 
     if (signInError?.message?.includes('Invalid login credentials')) {
-      const { data: createData, error: createError } = await this.supabase.auth.admin.createUser({
+      const { data: signUpData, error: signUpError } = await this.supabase.auth.signUp({
         email,
         password,
-        email_confirm: true,
-        user_metadata: {
-          student_id: data.studentId,
+        options: {
+          data: {
+            student_id: data.studentId,
+          },
+          emailRedirectTo: undefined,
         },
       });
 
-      if (createError) {
-        throw new Error(createError.message);
+      if (signUpError) {
+        console.error('Supabase signUp error:', {
+          message: signUpError.message,
+          status: signUpError.status,
+          name: signUpError.name,
+          cause: signUpError.cause,
+        });
+        throw new Error(`사용자 생성 실패: ${signUpError.message}`);
       }
 
-      if (!createData.user) {
+      if (!signUpData.user) {
         throw new Error('회원가입에 실패했습니다');
+      }
+
+      await this.createUserProfile(signUpData.user.id, data.studentId);
+
+      if (signUpData.session) {
+        return {
+          user: {
+            id: signUpData.user.id,
+            email: signUpData.user.email!,
+            studentId: data.studentId,
+          },
+          isNewUser: true,
+        };
       }
 
       const { data: autoSignInData, error: autoSignInError } = await this.supabase.auth.signInWithPassword({
@@ -177,7 +222,7 @@ export class AuthService {
       });
 
       if (autoSignInError || !autoSignInData.user) {
-        throw new Error('자동 로그인에 실패했습니다');
+        throw new Error('자동 로그인에 실패했습니다. 이메일 확인이 필요할 수 있습니다.');
       }
 
       return {

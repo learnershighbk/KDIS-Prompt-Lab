@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
+import { useCurrentUser } from "@/features/auth/hooks/useCurrentUser";
 import { KeyRound, User, Loader2 } from "lucide-react";
 
 type LoginPageProps = {
@@ -15,6 +16,7 @@ export default function LoginPage({ params }: LoginPageProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { simpleLogin, isAuthenticated } = useAuthStore();
+  const { refresh: refreshCurrentUser } = useCurrentUser();
   const [formState, setFormState] = useState({ studentId: "", pin: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -63,6 +65,7 @@ export default function LoginPage({ params }: LoginPageProps) {
         const result = await simpleLogin(formState.studentId, formState.pin);
 
         if (result.success) {
+          await refreshCurrentUser();
           const redirectedFrom = searchParams.get("redirectedFrom") ?? "/dashboard";
           router.replace(redirectedFrom);
         } else {
@@ -74,7 +77,7 @@ export default function LoginPage({ params }: LoginPageProps) {
         setIsSubmitting(false);
       }
     },
-    [formState.studentId, formState.pin, simpleLogin, router, searchParams]
+    [formState.studentId, formState.pin, simpleLogin, refreshCurrentUser, router, searchParams]
   );
 
   if (isAuthenticated) {

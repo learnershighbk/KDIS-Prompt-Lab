@@ -11,8 +11,13 @@ import {
 
 const aiRoutes = new Hono<AppEnv>();
 
-aiRoutes.post('/api/ai/socratic', async (c) => {
+const getAIService = (c: { get: (key: 'supabase' | 'config') => ReturnType<typeof c.get> }) => {
   const supabase = c.get('supabase');
+  const config = c.get('config');
+  return new AIService(supabase, config.anthropic.apiKey);
+};
+
+aiRoutes.post('/api/ai/socratic', async (c) => {
   const logger = c.get('logger');
 
   try {
@@ -27,7 +32,7 @@ aiRoutes.post('/api/ai/socratic', async (c) => {
     }
 
     const data = parseResult.data;
-    const service = new AIService(supabase);
+    const service = getAIService(c);
     const response = await service.generateSocraticResponse(data);
 
     logger.info('Socratic response generated', { moduleId: data.moduleId });
@@ -47,7 +52,6 @@ aiRoutes.post('/api/ai/socratic', async (c) => {
 });
 
 aiRoutes.post('/api/ai/socratic/stream', async (c) => {
-  const supabase = c.get('supabase');
   const logger = c.get('logger');
 
   try {
@@ -62,13 +66,12 @@ aiRoutes.post('/api/ai/socratic/stream', async (c) => {
     }
 
     const data = parseResult.data;
-    const service = new AIService(supabase);
-    const response = await service.generateSocraticResponse(data);
+    const service = getAIService(c);
 
     logger.info('Socratic stream started', { moduleId: data.moduleId });
 
     return streamText(c, async (stream) => {
-      for await (const chunk of service.streamResponse(response)) {
+      for await (const chunk of service.streamSocraticResponse(data)) {
         await stream.write(chunk);
       }
     });
@@ -81,8 +84,15 @@ aiRoutes.post('/api/ai/socratic/stream', async (c) => {
   }
 });
 
+aiRoutes.get('/api/ai/socratic/initial/:moduleId', async (c) => {
+  const moduleId = c.req.param('moduleId');
+  const service = getAIService(c);
+  const message = service.getInitialMessage(moduleId);
+
+  return c.json(success({ message }));
+});
+
 aiRoutes.post('/api/ai/analyze-prompt', async (c) => {
-  const supabase = c.get('supabase');
   const logger = c.get('logger');
 
   try {
@@ -97,7 +107,7 @@ aiRoutes.post('/api/ai/analyze-prompt', async (c) => {
     }
 
     const data = parseResult.data;
-    const service = new AIService(supabase);
+    const service = getAIService(c);
     const result = await service.analyzePrompt(data);
 
     logger.info('Prompt analyzed', { moduleId: data.moduleId });
@@ -113,7 +123,6 @@ aiRoutes.post('/api/ai/analyze-prompt', async (c) => {
 });
 
 aiRoutes.post('/api/ai/compare', async (c) => {
-  const supabase = c.get('supabase');
   const logger = c.get('logger');
 
   try {
@@ -128,7 +137,7 @@ aiRoutes.post('/api/ai/compare', async (c) => {
     }
 
     const data = parseResult.data;
-    const service = new AIService(supabase);
+    const service = getAIService(c);
     const result = await service.comparePrompts(data);
 
     logger.info('Prompts compared', { moduleId: data.moduleId });

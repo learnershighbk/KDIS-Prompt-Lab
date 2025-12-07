@@ -35,10 +35,14 @@ BEGIN
     NEW.id,
     NEW.raw_user_meta_data->>'full_name',
     v_student_id
-  );
+  )
+  ON CONFLICT (id) DO UPDATE SET
+    student_id = COALESCE(EXCLUDED.student_id, profiles.student_id),
+    updated_at = NOW();
 
   INSERT INTO user_roles (user_id, role)
-  VALUES (NEW.id, 'student');
+  VALUES (NEW.id, 'student')
+  ON CONFLICT (user_id, role) DO NOTHING;
 
   RETURN NEW;
 END;

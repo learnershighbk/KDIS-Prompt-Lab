@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -11,6 +11,7 @@ import {
   User,
   Lightbulb,
   ArrowRight,
+  Loader2,
 } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,6 +20,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { ROUTES } from '@/constants/routes';
 import { cn } from '@/lib/utils';
+import { useSocraticChat } from '@/features/ai/hooks/useAI';
 
 interface Message {
   id: string;
@@ -33,15 +35,15 @@ type SocraticDialoguePageProps = {
 
 const initialQuestions: Record<string, string> = {
   '11111111-1111-1111-1111-111111111111':
-    '안녕하세요! 오늘은 "좋은 질문이 좋은 답을 만든다"에 대해 함께 탐구해보겠습니다. 먼저 질문드릴게요: AI에게 질문할 때, 왜 구체적인 질문이 중요하다고 생각하시나요?',
+    '안녕하세요! 👋 오늘은 "좋은 질문이 좋은 답을 만든다"에 대해 함께 탐구해볼 거예요.\n\n시작하기 전에 한 가지 질문을 드릴게요: AI에게 질문할 때, 왜 구체적인 질문이 중요하다고 생각하시나요?\n\n편하게 생각나는 대로 답해주세요. 정답은 없어요! 🙂',
   '22222222-2222-2222-2222-222222222222':
-    '안녕하세요! 오늘은 문헌 리뷰를 효과적으로 하는 방법에 대해 이야기해보겠습니다. AI를 활용해 문헌을 검토할 때 어떤 점이 어렵다고 느끼시나요?',
+    '안녕하세요! 👋 오늘은 AI를 활용한 문헌 리뷰에 대해 이야기해볼게요.\n\n먼저 질문 하나: 문헌을 읽고 요약할 때, AI에게 어떤 식으로 도움을 요청하면 좋을까요?\n\n혹시 이미 시도해보신 경험이 있다면 그것도 좋아요!',
   '33333333-3333-3333-3333-333333333333':
-    '안녕하세요! 오늘은 정책 비교 분석에 대해 함께 탐구해보겠습니다. 두 가지 정책을 비교할 때 가장 중요한 기준은 무엇이라고 생각하시나요?',
+    '안녕하세요! 👋 오늘의 주제는 정책 비교 분석이에요.\n\n바로 질문 드릴게요: 두 나라의 정책을 비교한다면, 어떤 기준으로 비교하는 것이 공정할까요?\n\n예를 들어, 한국과 일본의 출산 정책을 비교한다고 생각해보세요.',
   '44444444-4444-4444-4444-444444444444':
-    '안녕하세요! 오늘은 데이터 해석에 대해 이야기해보겠습니다. 데이터를 볼 때 어떤 점에서 AI의 도움이 필요하다고 느끼시나요?',
+    '안녕하세요! 👋 오늘은 데이터 해석에 대해 함께 탐구해볼 거예요.\n\n질문 드릴게요: 데이터를 보고 분석할 때, AI의 도움이 가장 필요한 부분은 어디라고 생각하시나요?\n\n개인적인 경험이나 생각을 자유롭게 말씀해주세요.',
   '55555555-5555-5555-5555-555555555555':
-    '안녕하세요! 오늘은 정책 문서 작성에 대해 함께 탐구해보겠습니다. 정책 문서를 작성할 때 가장 어려운 부분은 무엇인가요?',
+    '안녕하세요! 👋 오늘은 정책 문서 작성에 대해 이야기해볼게요.\n\n먼저 한 가지 질문: 정책 문서를 작성할 때 가장 어려운 부분은 무엇인가요?\n\n구조 잡기, 논리 전개, 문장 다듬기... 어떤 것이든 좋아요.',
 };
 
 const hints: Record<string, string[]> = {
@@ -77,10 +79,11 @@ export default function SocraticDialoguePage({ params }: SocraticDialoguePagePro
   const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [currentHintIndex, setCurrentHintIndex] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const { mutate: sendMessage, isPending: isLoading } = useSocraticChat();
 
   useEffect(() => {
     const initialQuestion = initialQuestions[moduleId] || initialQuestions['11111111-1111-1111-1111-111111111111'];
@@ -98,7 +101,7 @@ export default function SocraticDialoguePage({ params }: SocraticDialoguePagePro
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = useCallback(async () => {
     if (!input.trim() || isLoading) return;
 
     const userMessage: Message = {
@@ -108,31 +111,45 @@ export default function SocraticDialoguePage({ params }: SocraticDialoguePagePro
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
     setInput('');
-    setIsLoading(true);
 
-    setTimeout(() => {
-      const responseMessages = [
-        '좋은 관점이에요! 조금 더 구체적으로 설명해주시겠어요? 예를 들어, 실제로 어떤 상황에서 이런 접근 방식을 적용할 수 있을까요?',
-        '흥미로운 생각이네요. 그렇다면 반대의 경우는 어떨까요? 만약 그렇게 하지 않는다면 어떤 문제가 발생할 수 있을까요?',
-        '네, 이해했습니다. 그 아이디어를 발전시켜서, 이것이 실제 정책 분석에 어떻게 적용될 수 있는지 생각해보셨나요?',
-        '좋은 지적입니다! 이제 한 단계 더 나아가볼까요? 이 개념을 다른 맥락에 적용한다면 어떻게 될까요?',
-      ];
+    const conversationHistory = updatedMessages
+      .filter((m) => m.id !== '1')
+      .map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
 
-      const randomResponse = responseMessages[Math.floor(Math.random() * responseMessages.length)];
-
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: randomResponse,
-        timestamp: new Date(),
-      };
-
-      setMessages((prev) => [...prev, assistantMessage]);
-      setIsLoading(false);
-    }, 1500);
-  };
+    sendMessage(
+      {
+        moduleId,
+        userMessage: input.trim(),
+        conversationHistory,
+      },
+      {
+        onSuccess: (data) => {
+          const assistantMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            content: data.message,
+            timestamp: new Date(),
+          };
+          setMessages((prev) => [...prev, assistantMessage]);
+        },
+        onError: (error) => {
+          const errorMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            content: `죄송합니다, 응답 생성 중 오류가 발생했습니다. 다시 시도해주세요.\n\n(오류: ${error.message})`,
+            timestamp: new Date(),
+          };
+          setMessages((prev) => [...prev, errorMessage]);
+        },
+      }
+    );
+  }, [input, isLoading, messages, moduleId, sendMessage]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -217,11 +234,10 @@ export default function SocraticDialoguePage({ params }: SocraticDialoguePagePro
                   <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
                     <Bot className="h-4 w-4" />
                   </div>
-                  <div className="bg-muted rounded-lg px-4 py-2">
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" />
-                      <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce delay-100" />
-                      <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce delay-200" />
+                  <div className="bg-muted rounded-lg px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">생각하는 중...</span>
                     </div>
                   </div>
                 </div>
@@ -237,6 +253,7 @@ export default function SocraticDialoguePage({ params }: SocraticDialoguePagePro
                 placeholder="답변을 입력하세요..."
                 className="resize-none"
                 rows={2}
+                disabled={isLoading}
               />
               <Button
                 onClick={handleSendMessage}
@@ -244,7 +261,11 @@ export default function SocraticDialoguePage({ params }: SocraticDialoguePagePro
                 size="icon"
                 className="h-auto"
               >
-                <Send className="h-4 w-4" />
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
               </Button>
             </div>
           </CardContent>

@@ -12,6 +12,8 @@ export const createServiceClient = ({
 }: ServiceClientConfig): SupabaseClient =>
   createClient(url, serviceRoleKey, {
     auth: {
+      autoRefreshToken: false,
       persistSession: false,
+      detectSessionInUrl: false,
     },
   });

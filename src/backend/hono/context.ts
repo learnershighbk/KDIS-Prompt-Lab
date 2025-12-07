@@ -8,6 +8,9 @@ export type AppConfig = {
     url: string;
     serviceRoleKey: string;
   };
+  anthropic: {
+    apiKey: string;
+  };
 };
 
 export type AppVariables = {
