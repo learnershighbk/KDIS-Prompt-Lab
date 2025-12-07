@@ -12,12 +12,15 @@ import {
   Lightbulb,
   ArrowRight,
   Loader2,
+  CheckCircle2,
+  MessageCircle,
 } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { ROUTES } from '@/constants/routes';
 import { cn } from '@/lib/utils';
 import { useSocraticChat } from '@/features/ai/hooks/useAI';
@@ -74,6 +77,8 @@ const hints: Record<string, string[]> = {
   ],
 };
 
+const MAX_EXCHANGES = 5;
+
 export default function SocraticDialoguePage({ params }: SocraticDialoguePageProps) {
   const { moduleId } = use(params);
   const router = useRouter();
@@ -81,9 +86,13 @@ export default function SocraticDialoguePage({ params }: SocraticDialoguePagePro
   const [input, setInput] = useState('');
   const [showHint, setShowHint] = useState(false);
   const [currentHintIndex, setCurrentHintIndex] = useState(0);
+  const [canProceed, setCanProceed] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { mutate: sendMessage, isPending: isLoading } = useSocraticChat();
+
+  const exchangeCount = Math.floor(messages.filter((m) => m.role === 'user').length);
+  const progressPercent = Math.min((exchangeCount / MAX_EXCHANGES) * 100, 100);
 
   useEffect(() => {
     const initialQuestion = initialQuestions[moduleId] || initialQuestions['11111111-1111-1111-1111-111111111111'];
@@ -137,6 +146,10 @@ export default function SocraticDialoguePage({ params }: SocraticDialoguePagePro
             timestamp: new Date(),
           };
           setMessages((prev) => [...prev, assistantMessage]);
+
+          if (data.canProceed) {
+            setCanProceed(true);
+          }
         },
         onError: (error) => {
           const errorMessage: Message = {
@@ -182,7 +195,14 @@ export default function SocraticDialoguePage({ params }: SocraticDialoguePagePro
           </Button>
           <Badge variant="outline">Step 1: 소크라테스 대화</Badge>
         </div>
-        <Button onClick={handleComplete}>
+        <Button
+          onClick={handleComplete}
+          className={cn(
+            'transition-all duration-300',
+            canProceed && 'bg-green-600 hover:bg-green-700 animate-pulse'
+          )}
+        >
+          {canProceed && <CheckCircle2 className="mr-2 h-4 w-4" />}
           다음 단계로
           <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
@@ -191,7 +211,14 @@ export default function SocraticDialoguePage({ params }: SocraticDialoguePagePro
       <div className="flex-1 grid gap-4 md:grid-cols-4">
         <Card className="md:col-span-3 flex flex-col">
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg">AI 튜터와의 대화</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg">AI 튜터와의 대화</CardTitle>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <MessageCircle className="h-4 w-4" />
+                <span>{exchangeCount} / {MAX_EXCHANGES} 대화</span>
+              </div>
+            </div>
+            <Progress value={progressPercent} className="h-1.5 mt-2" />
           </CardHeader>
           <CardContent className="flex-1 flex flex-col">
             <div className="flex-1 overflow-y-auto space-y-4 mb-4 min-h-0">
@@ -245,29 +272,45 @@ export default function SocraticDialoguePage({ params }: SocraticDialoguePagePro
               <div ref={messagesEndRef} />
             </div>
 
-            <div className="flex gap-2">
-              <Textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="답변을 입력하세요..."
-                className="resize-none"
-                rows={2}
-                disabled={isLoading}
-              />
-              <Button
-                onClick={handleSendMessage}
-                disabled={!input.trim() || isLoading}
-                size="icon"
-                className="h-auto"
-              >
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Send className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
+            {canProceed ? (
+              <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg p-4 text-center">
+                <CheckCircle2 className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                <p className="font-medium text-green-800 dark:text-green-200">
+                  🎉 소크라테스 대화를 완료했습니다!
+                </p>
+                <p className="text-sm text-green-600 dark:text-green-400 mt-1">
+                  오른쪽 상단의 &apos;다음 단계로&apos; 버튼을 클릭하여 프롬프트 작성으로 이동하세요.
+                </p>
+                <Button onClick={handleComplete} className="mt-3 bg-green-600 hover:bg-green-700">
+                  프롬프트 작성으로 이동
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <Textarea
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="답변을 입력하세요..."
+                  className="resize-none"
+                  rows={2}
+                  disabled={isLoading}
+                />
+                <Button
+                  onClick={handleSendMessage}
+                  disabled={!input.trim() || isLoading}
+                  size="icon"
+                  className="h-auto"
+                >
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -278,7 +321,7 @@ export default function SocraticDialoguePage({ params }: SocraticDialoguePagePro
               힌트
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             {showHint ? (
               <div className="space-y-3">
                 <p className="text-sm text-muted-foreground">
@@ -298,6 +341,18 @@ export default function SocraticDialoguePage({ params }: SocraticDialoguePagePro
                 </Button>
               </div>
             )}
+
+            <div className="pt-4 border-t">
+              <h4 className="text-sm font-medium mb-2">💡 학습 진행 안내</h4>
+              <p className="text-xs text-muted-foreground">
+                AI 튜터와 {MAX_EXCHANGES}회 정도 대화하면 핵심 개념을 이해할 수 있어요.
+                {exchangeCount >= 2 && !canProceed && (
+                  <span className="block mt-2 text-primary">
+                    충분히 대화했다면 &apos;다음 단계로&apos; 버튼을 눌러 진행할 수 있어요!
+                  </span>
+                )}
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>

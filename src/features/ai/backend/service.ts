@@ -15,8 +15,13 @@ export class AIService {
     });
   }
 
-  async generateSocraticResponse(data: SocraticRequest): Promise<string> {
+  async generateSocraticResponse(data: SocraticRequest): Promise<{ message: string; canProceed: boolean }> {
     const systemPrompt = getSocraticSystemPrompt(data.moduleId);
+
+    const conversationCount = Math.floor(data.conversationHistory.length / 2);
+    const contextHint = conversationCount >= 3
+      ? '\n\n[시스템 알림: 대화가 충분히 진행되었습니다. 학생이 핵심 개념을 이해했다면 이번 응답에서 마무리하세요.]'
+      : '';
 
     const messages: Anthropic.MessageParam[] = data.conversationHistory.map((msg) => ({
       role: msg.role,
@@ -25,7 +30,7 @@ export class AIService {
 
     messages.push({
       role: 'user',
-      content: data.userMessage,
+      content: data.userMessage + contextHint,
     });
 
     const response = await this.anthropic.messages.create({
@@ -36,7 +41,12 @@ export class AIService {
     });
 
     const textContent = response.content.find((block) => block.type === 'text');
-    return textContent?.type === 'text' ? textContent.text : '응답을 생성하지 못했습니다.';
+    const rawText = textContent?.type === 'text' ? textContent.text : '응답을 생성하지 못했습니다.';
+
+    const canProceed = rawText.includes('[READY_FOR_NEXT_STEP]');
+    const message = rawText.replace('[READY_FOR_NEXT_STEP]', '').trim();
+
+    return { message, canProceed };
   }
 
   async *streamSocraticResponse(data: SocraticRequest): AsyncGenerator<string> {

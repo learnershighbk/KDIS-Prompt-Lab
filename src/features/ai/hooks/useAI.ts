@@ -6,6 +6,7 @@ import { getSupabaseBrowserClient } from '@/lib/supabase/browser-client';
 
 interface SocraticResponse {
   message: string;
+  canProceed?: boolean;
 }
 
 interface PromptAnalysis {

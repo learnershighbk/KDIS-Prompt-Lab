@@ -24,7 +24,7 @@ export function Header({ onMenuClick }: HeaderProps) {
 
   const handleLogout = async () => {
     await logout();
-    router.push(ROUTES.LOGIN);
+    router.push(ROUTES.HOME);
   };
 
   const displayId = user?.studentId ?? user?.email?.split('@')[0] ?? '사용자';

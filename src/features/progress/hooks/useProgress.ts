@@ -3,27 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/remote/api-client';
 import { getSupabaseBrowserClient } from '@/lib/supabase/browser-client';
-
-interface UserProgress {
-  id: string;
-  moduleId: string;
-  moduleTitle: string;
-  status: 'not_started' | 'in_progress' | 'completed';
-  currentStep: string | null;
-  stepsCompleted: number;
-  totalSteps: number;
-  startedAt: string;
-  completedAt: string | null;
-}
-
-interface ProgressStats {
-  totalModules: number;
-  completedModules: number;
-  inProgressModules: number;
-  totalSteps: number;
-  completedSteps: number;
-  percentage: number;
-}
+import type { ProgressOverviewResponse, StepType } from '../backend/schema';
 
 interface ApiResponse<T> {
   success: boolean;
@@ -40,15 +20,12 @@ const getAuthHeader = async () => {
   return session?.access_token ? `Bearer ${session.access_token}` : '';
 };
 
-export const useUserProgress = () => {
+export const useProgressOverview = () => {
   return useQuery({
     queryKey: ['progress'],
     queryFn: async () => {
       const authHeader = await getAuthHeader();
-      const response = await apiClient.get<ApiResponse<{
-        progress: UserProgress[];
-        stats: ProgressStats;
-      }>>('/api/progress', {
+      const response = await apiClient.get<ApiResponse<ProgressOverviewResponse>>('/api/progress', {
         headers: { Authorization: authHeader },
       });
       return response.data.data;
@@ -60,18 +37,18 @@ export const useCompleteStep = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ progressId, stepData }: {
+    mutationFn: async ({ progressId, stepType }: {
       progressId: string;
-      stepData?: Record<string, unknown>;
+      stepType: StepType;
     }) => {
       const authHeader = await getAuthHeader();
       const response = await apiClient.post<ApiResponse<{
-        nextStep: string | null;
-        isModuleComplete: boolean;
-        earnedBadges: string[];
+        nextStep: StepType | null;
+        moduleCompleted: boolean;
+        unlockedModule: string | null;
       }>>(
         `/api/progress/${progressId}/complete-step`,
-        { stepData },
+        { stepType },
         { headers: { Authorization: authHeader } }
       );
       return response.data.data;
@@ -82,3 +59,5 @@ export const useCompleteStep = () => {
     },
   });
 };
+
+export const useUserProgress = useProgressOverview;

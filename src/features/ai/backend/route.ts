@@ -33,13 +33,14 @@ aiRoutes.post('/api/ai/socratic', async (c) => {
 
     const data = parseResult.data;
     const service = getAIService(c);
-    const response = await service.generateSocraticResponse(data);
+    const { message, canProceed } = await service.generateSocraticResponse(data);
 
-    logger.info('Socratic response generated', { moduleId: data.moduleId });
+    logger.info('Socratic response generated', { moduleId: data.moduleId, canProceed });
 
     return c.json(
       success({
-        message: response,
+        message,
+        canProceed,
       })
     );
   } catch (error) {

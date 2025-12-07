@@ -3,31 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/remote/api-client';
 import { getSupabaseBrowserClient } from '@/lib/supabase/browser-client';
-
-interface ModuleWithProgress {
-  id: string;
-  orderIndex: number;
-  title: string;
-  description: string;
-  objectives: string[];
-  techniques: string[];
-  estimatedMinutes: number;
-  progress: {
-    status: 'not_started' | 'in_progress' | 'completed';
-    currentStep: string | null;
-    stepsCompleted: number;
-    totalSteps: number;
-  } | null;
-  isUnlocked: boolean;
-}
-
-interface ModuleDetail extends ModuleWithProgress {
-  scenarios: Array<{
-    id: string;
-    title: string;
-    description: string;
-  }>;
-}
+import type { ModulesListResponse, ModuleDetailResponse, StartModuleResponse } from '../backend/schema';
 
 interface ApiResponse<T> {
   success: boolean;
@@ -49,7 +25,7 @@ export const useModules = () => {
     queryKey: ['modules'],
     queryFn: async () => {
       const authHeader = await getAuthHeader();
-      const response = await apiClient.get<ApiResponse<ModuleWithProgress[]>>('/api/modules', {
+      const response = await apiClient.get<ApiResponse<ModulesListResponse>>('/api/modules', {
         headers: { Authorization: authHeader },
       });
       return response.data.data;
@@ -62,7 +38,7 @@ export const useModule = (moduleId: string) => {
     queryKey: ['modules', moduleId],
     queryFn: async () => {
       const authHeader = await getAuthHeader();
-      const response = await apiClient.get<ApiResponse<ModuleDetail>>(`/api/modules/${moduleId}`, {
+      const response = await apiClient.get<ApiResponse<ModuleDetailResponse>>(`/api/modules/${moduleId}`, {
         headers: { Authorization: authHeader },
       });
       return response.data.data;
@@ -77,7 +53,7 @@ export const useStartModule = () => {
   return useMutation({
     mutationFn: async (moduleId: string) => {
       const authHeader = await getAuthHeader();
-      const response = await apiClient.post<ApiResponse<{ progressId: string }>>(
+      const response = await apiClient.post<ApiResponse<StartModuleResponse>>(
         `/api/modules/${moduleId}/start`,
         {},
         { headers: { Authorization: authHeader } }

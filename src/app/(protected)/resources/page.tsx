@@ -35,68 +35,19 @@ interface Resource {
   category: string;
   url: string;
   duration?: string;
-  moduleId?: string;
 }
 
 const resources: Resource[] = [
   {
     id: '1',
-    title: '프롬프트 엔지니어링 기초 가이드',
-    description: 'AI와 효과적으로 대화하기 위한 기본 원칙과 테크닉을 소개합니다.',
-    type: 'article',
-    category: '기초',
-    url: '#',
-    moduleId: '11111111-1111-1111-1111-111111111111',
-  },
-  {
-    id: '2',
-    title: 'ChatGPT 프롬프트 작성 베스트 프랙티스',
+    title: 'OpenAI 프롬프트 엔지니어링 가이드',
     description: 'OpenAI 공식 문서 기반의 프롬프트 작성 가이드입니다.',
     type: 'document',
     category: '기초',
-    url: '#',
-    moduleId: '11111111-1111-1111-1111-111111111111',
+    url: 'https://platform.openai.com/docs/guides/prompt-engineering',
   },
   {
-    id: '3',
-    title: '학술 연구를 위한 AI 활용법',
-    description: '문헌 리뷰, 연구 설계, 데이터 분석 등 학술 연구에 AI를 활용하는 방법을 다룹니다.',
-    type: 'video',
-    category: '심화',
-    url: '#',
-    duration: '25분',
-    moduleId: '22222222-2222-2222-2222-222222222222',
-  },
-  {
-    id: '4',
-    title: '정책 분석가를 위한 프롬프트 가이드',
-    description: '정책 비교, 영향 분석, 시나리오 플래닝 등에 활용할 수 있는 프롬프트 템플릿입니다.',
-    type: 'document',
-    category: '실무',
-    url: '#',
-    moduleId: '33333333-3333-3333-3333-333333333333',
-  },
-  {
-    id: '5',
-    title: '데이터 시각화를 위한 AI 프롬프트',
-    description: '차트 생성, 데이터 해석, 인사이트 도출에 효과적인 프롬프트 예시를 제공합니다.',
-    type: 'article',
-    category: '실무',
-    url: '#',
-    moduleId: '44444444-4444-4444-4444-444444444444',
-  },
-  {
-    id: '6',
-    title: '보고서 작성 자동화 튜토리얼',
-    description: 'AI를 활용한 보고서 구조화, 초안 작성, 교정 과정을 단계별로 안내합니다.',
-    type: 'video',
-    category: '심화',
-    url: '#',
-    duration: '35분',
-    moduleId: '55555555-5555-5555-5555-555555555555',
-  },
-  {
-    id: '7',
+    id: '2',
     title: 'Anthropic Claude 공식 프롬프트 가이드',
     description: 'Claude 모델의 특성과 효과적인 프롬프트 작성법을 설명하는 공식 가이드입니다.',
     type: 'link',
@@ -104,28 +55,28 @@ const resources: Resource[] = [
     url: 'https://docs.anthropic.com/claude/docs/intro-to-prompting',
   },
   {
-    id: '8',
+    id: '3',
     title: '체인 오브 쏘트(Chain of Thought) 프롬프팅',
     description: '복잡한 추론 작업을 위한 단계적 사고 유도 기법을 설명합니다.',
     type: 'article',
     category: '심화',
-    url: '#',
+    url: 'https://www.promptingguide.ai/techniques/cot',
   },
   {
-    id: '9',
+    id: '4',
     title: 'Few-shot Learning 프롬프트 전략',
     description: '예시를 활용하여 AI의 출력 품질을 높이는 방법을 다룹니다.',
     type: 'document',
     category: '심화',
-    url: '#',
+    url: 'https://www.promptingguide.ai/techniques/fewshot',
   },
   {
-    id: '10',
+    id: '5',
     title: 'AI 윤리와 책임있는 사용',
     description: 'AI 활용 시 고려해야 할 윤리적 측면과 모범 사례를 소개합니다.',
     type: 'article',
     category: '기초',
-    url: '#',
+    url: 'https://www.anthropic.com/responsible-ai',
   },
 ];
 

@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import {
   BarChart3,
   CheckCircle,
@@ -13,94 +12,25 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { useProgressOverview } from '@/features/progress/hooks/useProgress';
 
 type ProgressPageProps = {
   params: Promise<Record<string, never>>;
 };
 
-interface ModuleProgress {
-  moduleId: string;
-  title: string;
-  orderIndex: number;
-  status: 'not_started' | 'in_progress' | 'completed';
-  stepsCompleted: number;
-  totalSteps: number;
-  completedAt?: string;
-}
-
-interface OverallStats {
-  totalModules: number;
-  completedModules: number;
-  totalSteps: number;
-  completedSteps: number;
-  totalBadges: number;
-  learningStreak: number;
-}
-
-const mockModules: ModuleProgress[] = [
-  {
-    moduleId: '11111111-1111-1111-1111-111111111111',
-    title: '좋은 질문이 좋은 답을 만든다',
-    orderIndex: 1,
-    status: 'completed',
-    stepsCompleted: 4,
-    totalSteps: 4,
-    completedAt: '2024-01-15',
-  },
-  {
-    moduleId: '22222222-2222-2222-2222-222222222222',
-    title: '문헌 리뷰 효과적으로 하기',
-    orderIndex: 2,
-    status: 'in_progress',
-    stepsCompleted: 2,
-    totalSteps: 4,
-  },
-  {
-    moduleId: '33333333-3333-3333-3333-333333333333',
-    title: '정책 비교 분석 요청하기',
-    orderIndex: 3,
-    status: 'not_started',
-    stepsCompleted: 0,
-    totalSteps: 4,
-  },
-  {
-    moduleId: '44444444-4444-4444-4444-444444444444',
-    title: '데이터 해석 도움받기',
-    orderIndex: 4,
-    status: 'not_started',
-    stepsCompleted: 0,
-    totalSteps: 4,
-  },
-  {
-    moduleId: '55555555-5555-5555-5555-555555555555',
-    title: '정책 문서 작성 지원받기',
-    orderIndex: 5,
-    status: 'not_started',
-    stepsCompleted: 0,
-    totalSteps: 4,
-  },
-];
-
 export default function ProgressPage({ params }: ProgressPageProps) {
   void params;
-  const [modules, setModules] = useState<ModuleProgress[]>([]);
-  const [stats, setStats] = useState<OverallStats | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data, isLoading, error } = useProgressOverview();
 
-  useEffect(() => {
-    setModules(mockModules);
-    setStats({
-      totalModules: 5,
-      completedModules: 1,
-      totalSteps: 20,
-      completedSteps: 6,
-      totalBadges: 3,
-      learningStreak: 5,
-    });
-    setIsLoading(false);
-  }, []);
+  const modules = data?.modules ?? [];
+  const overall = data?.overall;
+  const badges = data?.badges ?? [];
 
-  const getStatusBadge = (status: ModuleProgress['status']) => {
+  const totalSteps = modules.reduce((acc, m) => acc + m.totalSteps, 0);
+  const completedSteps = modules.reduce((acc, m) => acc + m.stepsCompleted, 0);
+  const overallPercentage = totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
+
+  const getStatusBadge = (status: 'not_started' | 'in_progress' | 'completed') => {
     switch (status) {
       case 'completed':
         return <Badge className="bg-green-500">완료</Badge>;
@@ -111,14 +41,18 @@ export default function ProgressPage({ params }: ProgressPageProps) {
     }
   };
 
-  const overallPercentage = stats
-    ? Math.round((stats.completedSteps / stats.totalSteps) * 100)
-    : 0;
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-destructive">진도 정보를 불러오는 중 오류가 발생했습니다.</p>
       </div>
     );
   }
@@ -142,7 +76,7 @@ export default function ProgressPage({ params }: ProgressPageProps) {
             <div className="text-2xl font-bold">{overallPercentage}%</div>
             <Progress value={overallPercentage} className="mt-2" />
             <p className="text-xs text-muted-foreground mt-2">
-              {stats?.completedSteps}/{stats?.totalSteps} 단계 완료
+              {completedSteps}/{totalSteps} 단계 완료
             </p>
           </CardContent>
         </Card>
@@ -154,7 +88,7 @@ export default function ProgressPage({ params }: ProgressPageProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {stats?.completedModules}/{stats?.totalModules}
+              {overall?.completedModules ?? 0}/{overall?.totalModules ?? 0}
             </div>
             <p className="text-xs text-muted-foreground mt-2">모듈 완료</p>
           </CardContent>
@@ -166,7 +100,7 @@ export default function ProgressPage({ params }: ProgressPageProps) {
             <Trophy className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalBadges}</div>
+            <div className="text-2xl font-bold">{badges.length}</div>
             <p className="text-xs text-muted-foreground mt-2">기술 배지 획득</p>
           </CardContent>
         </Card>
@@ -177,7 +111,7 @@ export default function ProgressPage({ params }: ProgressPageProps) {
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.learningStreak}일</div>
+            <div className="text-2xl font-bold">-</div>
             <p className="text-xs text-muted-foreground mt-2">연속 학습 기록</p>
           </CardContent>
         </Card>
@@ -195,7 +129,7 @@ export default function ProgressPage({ params }: ProgressPageProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            {modules.map((module) => {
+            {modules.map((module, index) => {
               const percentage = Math.round(
                 (module.stepsCompleted / module.totalSteps) * 100
               );
@@ -204,9 +138,9 @@ export default function ProgressPage({ params }: ProgressPageProps) {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <span className="text-sm font-medium text-muted-foreground">
-                        M{module.orderIndex}
+                        M{index + 1}
                       </span>
-                      <span className="font-medium">{module.title}</span>
+                      <span className="font-medium">{module.moduleTitle}</span>
                       {getStatusBadge(module.status)}
                     </div>
                     <div className="flex items-center gap-2">
@@ -220,7 +154,7 @@ export default function ProgressPage({ params }: ProgressPageProps) {
                   {module.completedAt && (
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                       <Clock className="h-3 w-3" />
-                      완료일: {module.completedAt}
+                      완료일: {new Date(module.completedAt).toLocaleDateString('ko-KR')}
                     </p>
                   )}
                 </div>
