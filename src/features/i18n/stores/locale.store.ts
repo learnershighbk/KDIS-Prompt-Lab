@@ -18,6 +18,7 @@ export const useLocaleStore = create<LocaleState>()(
     }),
     {
       name: 'locale-storage',
+      skipHydration: true,
     }
   )
 );
