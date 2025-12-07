@@ -536,7 +536,7 @@ Module 페이지 내부 스텝 (탭 또는 스테퍼)
 |------|------|
 | API | Next.js API Routes |
 | Database | Supabase (PostgreSQL) |
-| 인증 | Supabase Auth 또는 Clerk |
+| 인증 | Supabase Auth |
 | 파일 저장 | Supabase Storage |
 
 ### 7.3 AI 통합

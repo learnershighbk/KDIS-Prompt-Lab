@@ -5,7 +5,7 @@
 ### 1.1 User 관련
 
 ```typescript
-// src/domain/entities/user.entity.ts
+// src/types/user.types.ts
 
 export type UserRole = 'student' | 'instructor' | 'admin';
 export type PreferredLanguage = 'ko' | 'en';
@@ -43,7 +43,7 @@ export interface Session {
 ### 1.2 Module 관련
 
 ```typescript
-// src/domain/entities/module.entity.ts
+// src/types/module.types.ts
 
 export type StepType = 
   | 'socratic_dialogue' 
@@ -99,7 +99,7 @@ export interface ModuleWithProgress extends Module {
 ### 1.3 Scenario 관련
 
 ```typescript
-// src/domain/entities/scenario.entity.ts
+// src/types/scenario.types.ts
 
 export type ScenarioCategory = 
   | 'literature_review'
@@ -145,7 +145,7 @@ export interface CriterionConfig {
 ### 1.4 Progress 관련
 
 ```typescript
-// src/domain/entities/progress.entity.ts
+// src/types/progress.types.ts
 
 export interface UserProgress {
   id: string;
@@ -181,7 +181,7 @@ export interface StepProgress {
 ### 1.5 Dialogue 관련
 
 ```typescript
-// src/domain/entities/dialogue.entity.ts
+// src/types/dialogue.types.ts
 
 export type MessageRole = 'tutor' | 'student';
 export type QuestionType = 
@@ -218,7 +218,7 @@ export interface DialogueContext {
 ### 1.6 Prompt 관련
 
 ```typescript
-// src/domain/entities/prompt.entity.ts
+// src/types/prompt.types.ts
 
 export interface PromptAttempt {
   id: string;
@@ -245,7 +245,7 @@ export interface PromptWithScenario extends PromptAttempt {
 ### 1.7 Comparison 관련
 
 ```typescript
-// src/domain/entities/comparison.entity.ts
+// src/types/comparison.types.ts
 
 export interface Comparison {
   id: string;
@@ -279,7 +279,7 @@ export interface AnalysisDimension {
 ### 1.8 Reflection 관련
 
 ```typescript
-// src/domain/entities/reflection.entity.ts
+// src/types/reflection.types.ts
 
 export interface Reflection {
   id: string;
@@ -305,7 +305,7 @@ export interface ReflectionWithModule extends Reflection {
 ### 1.9 Badge 관련
 
 ```typescript
-// src/domain/entities/badge.entity.ts
+// src/types/badge.types.ts
 
 export interface TechniqueBadge {
   id: string;

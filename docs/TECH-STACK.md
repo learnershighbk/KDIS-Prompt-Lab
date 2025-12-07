@@ -40,7 +40,7 @@ TanStack Query 5.x (React Query)
 Supabase
 ├── PostgreSQL 15
 ├── Auth (Supabase Auth)
-├── Row Level Security
+├── RLS 비활성화 (애플리케이션 레벨 권한 관리)
 ├── Edge Functions
 └── Realtime (선택)
 ```

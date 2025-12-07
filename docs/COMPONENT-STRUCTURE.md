@@ -1,5 +1,8 @@
 # Prompt Lab 컴포넌트 구조
 
+> **타입 참조**: 모든 도메인 엔티티 및 API 타입은 `TYPE-DEFINITIONS.md`를 단일 소스로 사용합니다.
+> 이 문서의 인라인 타입 정의는 설명 목적이며, 실제 구현 시 `src/types/` 경로를 사용하세요.
+
 ## 1. 컴포넌트 설계 원칙
 
 ### 1.1 Atomic Design 적용
@@ -119,7 +122,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, type LoginInput } from '@/lib/validations';
-import { useAuthStore } from '@/stores/auth.store';
+import { useAuthStore } from '@/features/auth/stores/auth.store';
 import { Button, Input, Label } from '@/components/ui';
 
 export function LoginForm() {
@@ -226,7 +229,7 @@ export function AuthGuard({ children, requiredRole }: AuthGuardProps) {
 import Link from 'next/link';
 import { Lock, CheckCircle, Circle, PlayCircle } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, Badge, Progress } from '@/components/ui';
-import type { ModuleWithProgress } from '@/domain/entities/module.entity';
+import type { ModuleWithProgress } from '@/types/module.types';
 
 interface ModuleCardProps {
   module: ModuleWithProgress;
@@ -307,7 +310,7 @@ export function ModuleCard({ module }: ModuleCardProps) {
 
 import { Check, Circle, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { StepType } from '@/domain/entities/module.entity';
+import type { StepType } from '@/types/module.types';
 import { STEP_TITLES } from '@/lib/constants';
 
 interface StepIndicatorProps {
@@ -384,7 +387,7 @@ export function StepIndicator({
 ### 3.3 소크라테스 대화 (Socratic Dialogue)
 
 ```typescript
-// src/features/socratic-dialogue/components/dialogue-container.tsx
+// src/features/dialogue/components/dialogue-container.tsx
 
 'use client';
 
@@ -464,11 +467,11 @@ export function DialogueContainer({ progressId, onComplete }: DialogueContainerP
 ```
 
 ```typescript
-// src/features/socratic-dialogue/components/chat-bubble.tsx
+// src/features/dialogue/components/chat-bubble.tsx
 
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui';
-import type { DialogueMessage } from '@/domain/entities/dialogue.entity';
+import type { DialogueMessage } from '@/types/dialogue.types';
 import { QUESTION_TYPE_LABELS } from '@/lib/constants';
 
 interface ChatBubbleProps {
@@ -535,7 +538,7 @@ import { Card, Tabs, TabsList, TabsTrigger, TabsContent, Badge } from '@/compone
 import { SideBySide } from './side-by-side';
 import { AnalysisChart } from './analysis-chart';
 import { DifferenceHighlight } from './difference-highlight';
-import type { Comparison } from '@/domain/entities/comparison.entity';
+import type { Comparison } from '@/types/comparison.types';
 
 interface ComparisonPanelProps {
   comparison: Comparison;
@@ -618,7 +621,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
-import type { PromptAnalysis } from '@/domain/entities/comparison.entity';
+import type { PromptAnalysis } from '@/types/comparison.types';
 
 interface AnalysisChartProps {
   analysis: PromptAnalysis;
@@ -772,7 +775,7 @@ export function ReflectionForm({
 import { Card, CardHeader, CardTitle, CardContent, Progress } from '@/components/ui';
 import { BadgeDisplay } from './badge-display';
 import { ActivityTimeline } from './activity-timeline';
-import type { OverallProgress, BadgeWithModule } from '@/domain/entities';
+import type { OverallProgress, BadgeWithModule } from '@/types';
 
 interface ProgressOverviewProps {
   progress: OverallProgress;
@@ -866,8 +869,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 'use client';
 
 import Link from 'next/link';
-import { useAuthStore } from '@/stores/auth.store';
-import { useProgressStore } from '@/stores/progress.store';
+import { useAuthStore } from '@/features/auth/stores/auth.store';
+import { useProgressStore } from '@/features/progress/stores/progress.store';
 import { Button, Avatar, AvatarFallback, DropdownMenu } from '@/components/ui';
 import { LanguageSwitcher } from '@/components/common/language-switcher';
 

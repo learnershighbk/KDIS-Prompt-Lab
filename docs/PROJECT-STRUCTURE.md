@@ -28,8 +28,11 @@ prompt-lab/
 │   │       ├── components/       # 피처별 컴포넌트
 │   │       ├── constants/        # 피처별 상수
 │   │       ├── hooks/            # 피처별 훅
+│   │       ├── stores/           # 피처별 Zustand 스토어
 │   │       ├── lib/              # 피처별 유틸/DTO
 │   │       └── types.ts          # 피처별 타입
+│   ├── stores/                   # 공통 UI 스토어
+│   │   └── ui.store.ts           # 테마, 언어, 사이드바 상태
 │   ├── hooks/                    # 공통 커스텀 훅
 │   └── lib/                      # 공통 유틸리티
 │       ├── remote/               # API 클라이언트
@@ -159,6 +162,8 @@ src/features/
 │   │   └── current-user-context.tsx
 │   ├── hooks/
 │   │   └── useCurrentUser.ts
+│   ├── stores/
+│   │   └── auth.store.ts         # 인증 상태 관리
 │   ├── lib/
 │   │   └── dto.ts                # DTO 재노출
 │   └── types.ts
@@ -191,6 +196,8 @@ src/features/
 │   │   └── typing-indicator.tsx
 │   ├── hooks/
 │   │   └── useDialogue.ts
+│   ├── stores/
+│   │   └── dialogue.store.ts     # 대화 상태 관리
 │   └── types.ts
 │
 ├── prompt-lab/                   # 프롬프트 작성 피처
@@ -244,6 +251,8 @@ src/features/
 │   │   └── activity-timeline.tsx
 │   ├── hooks/
 │   │   └── useProgress.ts
+│   ├── stores/
+│   │   └── progress.store.ts     # 진도 상태 관리
 │   └── types.ts
 │
 ├── resources/                    # 학습 리소스 피처
@@ -320,6 +329,26 @@ src/hooks/
 ├── use-toast.ts                  # 토스트 알림
 ├── use-media-query.ts            # 반응형 처리
 └── use-local-storage.ts          # 로컬 스토리지
+```
+
+## 7-1. Stores (src/stores/)
+
+Zustand 스토어 위치 규칙:
+- **공통 UI 스토어**: `src/stores/` (테마, 언어, 사이드바 등 앱 전역 UI 상태)
+- **피처별 스토어**: `src/features/[feature]/stores/` (인증, 진도, 대화 등 도메인 상태)
+
+```
+src/stores/
+└── ui.store.ts                   # 공통 UI 상태 (테마, 언어, 사이드바)
+
+src/features/auth/stores/
+└── auth.store.ts                 # 인증 상태 (사용자, 세션)
+
+src/features/progress/stores/
+└── progress.store.ts             # 진도 상태 (현재 모듈, 배지)
+
+src/features/dialogue/stores/
+└── dialogue.store.ts             # 대화 상태 (메시지, 스트리밍)
 ```
 
 ## 8. Constants (src/constants/)

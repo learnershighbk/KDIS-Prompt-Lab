@@ -122,7 +122,7 @@ echo "=== Prompt Lab Integration Check ==="
 
 # 1. 환경 변수 확인
 check_env() {
-  local vars=("NEXT_PUBLIC_SUPABASE_URL" "NEXT_PUBLIC_SUPABASE_ANON_KEY" "OPENAI_API_KEY")
+  local vars=("NEXT_PUBLIC_SUPABASE_URL" "NEXT_PUBLIC_SUPABASE_ANON_KEY" "ANTHROPIC_API_KEY")
   for var in "${vars[@]}"; do
     if [ -z "${!var}" ]; then
       echo "❌ Missing: $var"
@@ -161,7 +161,7 @@ import { describe, it, expect } from 'vitest';
 
 describe('API Integration', () => {
   it('should authenticate user', async () => {
-    const res = await fetch('/api/v1/auth/login', {
+    const res = await fetch('/api/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email: 'test@kdi.ac.kr', password: 'test1234' }),
     });
@@ -169,14 +169,14 @@ describe('API Integration', () => {
   });
 
   it('should fetch modules', async () => {
-    const res = await fetch('/api/v1/modules');
+    const res = await fetch('/api/modules');
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.data.length).toBe(5);
   });
 
   it('should stream dialogue', async () => {
-    const res = await fetch('/api/v1/ai/stream/dialogue', {
+    const res = await fetch('/api/ai/stream/dialogue', {
       method: 'POST',
       body: JSON.stringify({ progressId: 'test-id', message: 'Hello' }),
     });
@@ -206,15 +206,15 @@ import type { Module } from '@/types';
 
 ```typescript
 // 해결: API-SPEC.md의 경로 규칙 준수
-// /api/v1/{resource}/{action}
+// /api/{resource}/{action}
 
 // ❌ 잘못된 예
 /api/getModules
 /api/module/fetch
 
 // ✅ 올바른 예
-/api/v1/modules
-/api/v1/modules/:id
+/api/modules
+/api/modules/:id
 ```
 
 ### 상태 관리 충돌

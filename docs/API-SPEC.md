@@ -3,7 +3,7 @@
 ## 1. API 개요
 
 ### 기본 정보
-- **Base URL**: `/api/v1`
+- **Base URL**: `/api`
 - **인증**: Supabase JWT (Bearer Token)
 - **Content-Type**: `application/json`
 
@@ -50,7 +50,7 @@ interface ErrorResponse {
 ### 2.1 회원가입
 
 ```
-POST /api/v1/auth/register
+POST /api/auth/signup
 ```
 
 **Request Body:**
@@ -86,7 +86,7 @@ POST /api/v1/auth/register
 ### 2.2 로그인
 
 ```
-POST /api/v1/auth/login
+POST /api/auth/login
 ```
 
 **Request Body:**
@@ -120,7 +120,7 @@ POST /api/v1/auth/login
 ### 2.3 로그아웃
 
 ```
-POST /api/v1/auth/logout
+POST /api/auth/logout
 Authorization: Bearer {token}
 ```
 
@@ -137,7 +137,7 @@ Authorization: Bearer {token}
 ### 2.4 세션 갱신
 
 ```
-POST /api/v1/auth/refresh
+POST /api/auth/refresh
 ```
 
 **Request Body:**
@@ -154,7 +154,7 @@ POST /api/v1/auth/refresh
 ### 3.1 모듈 목록 조회
 
 ```
-GET /api/v1/modules
+GET /api/modules
 Authorization: Bearer {token}
 ```
 
@@ -192,7 +192,7 @@ Authorization: Bearer {token}
 ### 3.2 모듈 상세 조회
 
 ```
-GET /api/v1/modules/:moduleId
+GET /api/modules/:moduleId
 Authorization: Bearer {token}
 ```
 
@@ -232,7 +232,7 @@ Authorization: Bearer {token}
 ### 3.3 모듈 시작/진입
 
 ```
-POST /api/v1/modules/:moduleId/start
+POST /api/modules/:moduleId/start
 Authorization: Bearer {token}
 ```
 
@@ -257,7 +257,7 @@ Authorization: Bearer {token}
 ### 4.1 대화 시작
 
 ```
-POST /api/v1/dialogues
+POST /api/dialogues
 Authorization: Bearer {token}
 ```
 
@@ -286,7 +286,7 @@ Authorization: Bearer {token}
 ### 4.2 대화 메시지 전송
 
 ```
-POST /api/v1/dialogues/:dialogueId/messages
+POST /api/dialogues/:dialogueId/messages
 Authorization: Bearer {token}
 ```
 
@@ -322,7 +322,7 @@ Authorization: Bearer {token}
 ### 4.3 대화 기록 조회
 
 ```
-GET /api/v1/dialogues/:dialogueId
+GET /api/dialogues/:dialogueId
 Authorization: Bearer {token}
 ```
 
@@ -350,7 +350,7 @@ Authorization: Bearer {token}
 ### 5.1 시나리오 조회
 
 ```
-GET /api/v1/scenarios/:scenarioId
+GET /api/scenarios/:scenarioId
 Authorization: Bearer {token}
 ```
 
@@ -373,7 +373,7 @@ Authorization: Bearer {token}
 ### 5.2 프롬프트 제출
 
 ```
-POST /api/v1/prompts/submit
+POST /api/prompts/submit
 Authorization: Bearer {token}
 ```
 
@@ -404,7 +404,7 @@ Authorization: Bearer {token}
 ### 5.3 프롬프트 시도 기록 조회
 
 ```
-GET /api/v1/prompts/attempts
+GET /api/prompts/attempts
 Authorization: Bearer {token}
 ```
 
@@ -441,7 +441,7 @@ Authorization: Bearer {token}
 ### 6.1 비교 생성
 
 ```
-POST /api/v1/comparisons
+POST /api/comparisons
 Authorization: Bearer {token}
 ```
 
@@ -480,7 +480,7 @@ Authorization: Bearer {token}
 ### 6.2 비교 결과 조회
 
 ```
-GET /api/v1/comparisons/:comparisonId
+GET /api/comparisons/:comparisonId
 Authorization: Bearer {token}
 ```
 
@@ -491,7 +491,7 @@ Authorization: Bearer {token}
 ### 7.1 성찰 저장
 
 ```
-POST /api/v1/reflections
+POST /api/reflections
 Authorization: Bearer {token}
 ```
 
@@ -525,7 +525,7 @@ Authorization: Bearer {token}
 ### 7.2 성찰 목록 조회
 
 ```
-GET /api/v1/reflections
+GET /api/reflections
 Authorization: Bearer {token}
 ```
 
@@ -555,7 +555,7 @@ Authorization: Bearer {token}
 ### 8.1 전체 진도 조회
 
 ```
-GET /api/v1/progress
+GET /api/progress
 Authorization: Bearer {token}
 ```
 
@@ -595,7 +595,7 @@ Authorization: Bearer {token}
 ### 8.2 단계 완료 처리
 
 ```
-POST /api/v1/progress/:progressId/complete-step
+POST /api/progress/:progressId/complete-step
 Authorization: Bearer {token}
 ```
 
@@ -625,7 +625,7 @@ Authorization: Bearer {token}
 ### 9.1 학생 진도 조회 (교수자용)
 
 ```
-GET /api/v1/instructor/students/progress
+GET /api/instructor/students/progress
 Authorization: Bearer {token}
 X-Role: instructor
 ```
@@ -658,9 +658,9 @@ X-Role: instructor
 ### 9.2 시나리오 관리 (CRUD)
 
 ```
-POST /api/v1/instructor/scenarios
-PUT /api/v1/instructor/scenarios/:scenarioId
-DELETE /api/v1/instructor/scenarios/:scenarioId
+POST /api/instructor/scenarios
+PUT /api/instructor/scenarios/:scenarioId
+DELETE /api/instructor/scenarios/:scenarioId
 Authorization: Bearer {token}
 X-Role: instructor
 ```
@@ -672,14 +672,14 @@ X-Role: instructor
 ### 10.1 평가 대상 할당 받기
 
 ```
-GET /api/v1/peer-reviews/assigned
+GET /api/peer-reviews/assigned
 Authorization: Bearer {token}
 ```
 
 ### 10.2 동료 평가 제출
 
 ```
-POST /api/v1/peer-reviews
+POST /api/peer-reviews
 Authorization: Bearer {token}
 ```
 
@@ -704,7 +704,7 @@ Authorization: Bearer {token}
 ### 11.1 대화 스트리밍
 
 ```
-POST /api/v1/ai/stream/dialogue
+POST /api/ai/stream/dialogue
 Authorization: Bearer {token}
 Content-Type: application/json
 Accept: text/event-stream
@@ -736,7 +736,7 @@ data: {"questionType": "clarification", "canProceed": false}
 ### 11.2 프롬프트 응답 스트리밍
 
 ```
-POST /api/v1/ai/stream/prompt
+POST /api/ai/stream/prompt
 Authorization: Bearer {token}
 Accept: text/event-stream
 ```
@@ -748,7 +748,7 @@ Accept: text/event-stream
 ### 12.1 리소스 목록 조회
 
 ```
-GET /api/v1/resources
+GET /api/resources
 Authorization: Bearer {token}
 ```
 

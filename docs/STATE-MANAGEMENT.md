@@ -1,5 +1,8 @@
 # Prompt Lab 상태 관리
 
+> **타입 참조**: 모든 도메인 엔티티 및 스토어 타입은 `TYPE-DEFINITIONS.md`를 단일 소스로 사용합니다.  
+> 이 문서의 인라인 타입 정의는 설명 목적이며, 실제 구현 시 `src/domain/entities/`, `src/types/`, `src/stores/types.ts` 경로를 사용하세요.
+
 ## 1. 상태 관리 전략
 
 ### 1.1 상태 분류
@@ -45,7 +48,7 @@
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { createClient } from '@/infrastructure/supabase/client';
+import { createClient } from '@/lib/supabase/browser-client';
 import type { UserWithProfile, Session } from '@/domain/entities/user.entity';
 import type { LoginRequest, RegisterRequest } from '@/types/auth.types';
 
@@ -262,7 +265,7 @@ import type {
   StepType 
 } from '@/domain/entities/progress.entity';
 import type { BadgeWithModule } from '@/domain/entities/badge.entity';
-import { progressService } from '@/services/progress.service';
+import { apiClient } from '@/lib/remote/api-client';
 
 interface ProgressState {
   // State
@@ -297,8 +300,8 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
     
     try {
       const [overall, badges] = await Promise.all([
-        progressService.getOverallProgress(),
-        progressService.getBadges(),
+        apiClient.get<OverallProgress>('/api/progress').then(res => res.data),
+        apiClient.get<BadgeWithModule[]>('/api/progress/badges').then(res => res.data),
       ]);
 
       set({
@@ -319,7 +322,7 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
     if (cached) return cached;
 
     try {
-      const progress = await progressService.getModuleProgress(moduleId);
+      const { data: progress } = await apiClient.get<UserProgress>(`/api/progress/module/${moduleId}`);
       
       if (progress) {
         set((state) => ({
@@ -338,7 +341,7 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
     set({ isLoading: true });
     
     try {
-      const progress = await progressService.startModule(moduleId);
+      const { data: progress } = await apiClient.post<UserProgress>(`/api/modules/${moduleId}/start`);
       
       set((state) => ({
         currentProgress: progress,
@@ -358,7 +361,7 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
 
   completeStep: async (progressId, stepType) => {
     try {
-      const result = await progressService.completeStep(progressId, stepType);
+      const { data: result } = await apiClient.post<{ moduleCompleted: boolean; badgesEarned: BadgeWithModule[] }>(`/api/progress/${progressId}/complete-step`, { stepType });
       
       // 현재 진도 업데이트
       const currentProgress = get().currentProgress;
@@ -604,36 +607,37 @@ export const queryKeys = {
 ### 3.3 Custom Hooks with React Query
 
 ```typescript
-// src/hooks/useModules.ts
+// src/features/modules/hooks/useModules.ts
 
 import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/query-keys';
-import { moduleService } from '@/services/module.service';
+import { apiClient } from '@/lib/remote/api-client';
+import type { ModuleWithProgress } from '@/domain/entities/module.entity';
 
 export function useModules() {
   return useQuery({
     queryKey: queryKeys.modules.list(),
-    queryFn: () => moduleService.getModules(),
+    queryFn: () => apiClient.get<{ modules: ModuleWithProgress[] }>('/api/modules').then(res => res.data.modules),
   });
 }
 
 export function useModule(moduleId: string) {
   return useQuery({
     queryKey: queryKeys.modules.detail(moduleId),
-    queryFn: () => moduleService.getModuleById(moduleId),
+    queryFn: () => apiClient.get<{ module: ModuleWithProgress }>(`/api/modules/${moduleId}`).then(res => res.data.module),
     enabled: !!moduleId,
   });
 }
 ```
 
 ```typescript
-// src/hooks/useProgress.ts
+// src/features/progress/hooks/useProgress.ts
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/query-keys';
-import { progressService } from '@/services/progress.service';
+import { apiClient } from '@/lib/remote/api-client';
 import { useProgressStore } from '@/features/progress/stores/progress.store';
-import type { StepType } from '@/domain/entities/progress.entity';
+import type { StepType, OverallProgress } from '@/domain/entities/progress.entity';
 
 export function useOverallProgress() {
   const setStore = useProgressStore((state) => ({
@@ -642,10 +646,7 @@ export function useOverallProgress() {
 
   return useQuery({
     queryKey: queryKeys.progress.overall(),
-    queryFn: async () => {
-      const data = await progressService.getOverallProgress();
-      return data;
-    },
+    queryFn: () => apiClient.get<OverallProgress>('/api/progress').then(res => res.data),
   });
 }
 
@@ -675,7 +676,7 @@ export function useCompleteStep() {
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/infrastructure/supabase/client';
+import { createClient } from '@/lib/supabase/browser-client';
 import { useAuthStore } from '@/features/auth/stores/auth.store';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -746,18 +747,19 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
 ## 5. 낙관적 업데이트 예시
 
 ```typescript
-// src/hooks/useReflectionMutation.ts
+// src/features/reflection/hooks/useReflectionMutation.ts
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/query-keys';
-import { reflectionService } from '@/services/reflection.service';
+import { apiClient } from '@/lib/remote/api-client';
 import type { ReflectionInput } from '@/types/reflection.types';
+import type { Reflection } from '@/domain/entities/reflection.entity';
 
 export function useCreateReflection() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: ReflectionInput) => reflectionService.create(data),
+    mutationFn: (data: ReflectionInput) => apiClient.post<Reflection>('/api/reflections', data).then(res => res.data),
     
     // 낙관적 업데이트
     onMutate: async (newReflection) => {

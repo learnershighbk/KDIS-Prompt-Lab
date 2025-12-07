@@ -39,7 +39,7 @@ Supabase(PostgreSQL)를 사용합니다. RLS(Row Level Security)는 사용하지
 │ step_type       │     │ category        │
 │ content         │     │ title           │
 │ created_at      │     │ context         │
-└─────────────────┘     │ base_prompt     │
+└─────────────────┘     │ base_prompt(NN) │
                         │ improved_prompt │
                         └─────────────────┘
                                 │
@@ -74,6 +74,18 @@ Supabase(PostgreSQL)를 사용합니다. RLS(Row Level Security)는 사용하지
 │ earned_at       │     │ scores (JSON)   │
 │ module_id (FK)  │     │ feedback        │
 └─────────────────┘     └─────────────────┘
+
+┌─────────────────┐     ┌─────────────────────────┐
+│    resources    │     │ socratic_question_      │
+├─────────────────┤     │ templates               │
+│ id (PK)         │     ├─────────────────────────┤
+│ title           │     │ id (PK)                 │
+│ description     │     │ module_id (FK)          │
+│ category        │     │ question_type           │
+│ type            │     │ question_text           │
+│ url             │     │ order_index             │
+│ techniques      │     │ is_active               │
+└─────────────────┘     └─────────────────────────┘
 ```
 
 ## 3. 테이블 정의
@@ -179,7 +191,7 @@ CREATE TABLE scenarios (
   title_en TEXT,
   context TEXT NOT NULL,
   context_en TEXT,
-  base_prompt_example TEXT,
+  base_prompt_example TEXT NOT NULL, -- 비교 실험실 핵심: 학생 프롬프트(예상) vs 개선 프롬프트 비교
   improved_prompt_example TEXT NOT NULL,
   comparison_criteria JSONB NOT NULL DEFAULT '{}',
   is_active BOOLEAN DEFAULT true,
@@ -320,7 +332,204 @@ CREATE TABLE technique_badges (
 ALTER TABLE technique_badges DISABLE ROW LEVEL SECURITY;
 ```
 
-### 3.12 peer_reviews (Phase 3)
+### 3.12 resources
+
+```sql
+CREATE TYPE resource_category AS ENUM ('technique', 'guide', 'video', 'advanced');
+CREATE TYPE resource_type AS ENUM ('article', 'video', 'document', 'course');
+
+CREATE TABLE resources (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  title_en TEXT,
+  description TEXT,
+  description_en TEXT,
+  category resource_category NOT NULL,
+  type resource_type NOT NULL,
+  url TEXT NOT NULL,
+  techniques TEXT[] DEFAULT '{}', -- 관련 테크닉 (예: ['Chain of Thought', 'Few-shot'])
+  is_active BOOLEAN DEFAULT true,
+  order_index INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS 비활성화 (애플리케이션 레벨에서 권한 관리)
+ALTER TABLE resources DISABLE ROW LEVEL SECURITY;
+
+-- 인덱스
+CREATE INDEX idx_resources_category ON resources(category);
+CREATE INDEX idx_resources_type ON resources(type);
+
+-- 자동 업데이트 트리거
+CREATE TRIGGER update_resources_updated_at
+  BEFORE UPDATE ON resources
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
+-- 샘플 데이터
+INSERT INTO resources (title, title_en, description, category, type, url, techniques) VALUES
+-- 테크닉 정리
+('Chain of Thought 가이드', 'Chain of Thought Guide', '단계별 사고 유도 테크닉 설명', 'technique', 'article', '#', ARRAY['Chain of Thought']),
+('Few-shot Learning 가이드', 'Few-shot Learning Guide', '예시 기반 학습 유도 테크닉', 'technique', 'article', '#', ARRAY['Few-shot Learning']),
+('Persona 설정 가이드', 'Persona Setting Guide', '전문가 정체성 부여 테크닉', 'technique', 'article', '#', ARRAY['Persona']),
+-- 공식 가이드
+('Anthropic Prompt Engineering Guide', 'Anthropic Prompt Engineering Guide', 'Claude 공식 프롬프트 엔지니어링 가이드', 'guide', 'document', 'https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview', ARRAY[]::TEXT[]),
+('OpenAI Prompt Engineering Guide', 'OpenAI Prompt Engineering Guide', 'OpenAI 공식 프롬프트 가이드', 'guide', 'document', 'https://platform.openai.com/docs/guides/prompt-engineering', ARRAY[]::TEXT[]),
+('DAIR.AI Prompt Engineering Guide', 'DAIR.AI Prompt Engineering Guide (Korean)', '한국어 프롬프트 엔지니어링 가이드', 'guide', 'document', 'https://www.promptingguide.ai/kr', ARRAY[]::TEXT[]),
+-- 추천 영상
+('Anthropic YouTube 채널', 'Anthropic YouTube Channel', 'Claude 공식 튜토리얼', 'video', 'video', 'https://www.youtube.com/@anthropic-ai', ARRAY[]::TEXT[]),
+('AI Jason 채널', 'AI Jason Channel', '실용적 프롬프트 팁', 'video', 'video', 'https://www.youtube.com/@AIJasonZ', ARRAY[]::TEXT[]),
+-- 심화 학습
+('DeepLearning.AI 프롬프트 코스', 'DeepLearning.AI Prompt Course', 'ChatGPT 프롬프트 엔지니어링 무료 코스', 'advanced', 'course', 'https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/', ARRAY[]::TEXT[]),
+('Chain-of-Thought 논문', 'Chain-of-Thought Paper', 'CoT 기법 원본 학술 논문', 'advanced', 'document', 'https://arxiv.org/abs/2201.11903', ARRAY['Chain of Thought']);
+```
+
+### 3.13 socratic_question_templates
+
+소크라테스식 대화에서 사용되는 유도 질문 템플릿을 관리합니다.
+
+```sql
+CREATE TYPE question_type AS ENUM (
+  'exploration',       -- 탐색 질문: 기존 지식 확인
+  'clarification',     -- 명료화 질문: 생각 구체화
+  'assumption',        -- 가정 검증 질문: 전제 점검
+  'consequence',       -- 결과 예측 질문: 비판적 사고
+  'reflection'         -- 성찰 질문: 배운 점 정리
+);
+
+CREATE TABLE socratic_question_templates (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  module_id UUID NOT NULL REFERENCES modules(id) ON DELETE CASCADE,
+  question_type question_type NOT NULL,
+  question_text TEXT NOT NULL,
+  question_text_en TEXT,
+  purpose TEXT, -- 질문의 교육적 목적 설명
+  order_index INTEGER NOT NULL DEFAULT 0,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS 비활성화 (애플리케이션 레벨에서 권한 관리)
+ALTER TABLE socratic_question_templates DISABLE ROW LEVEL SECURITY;
+
+-- 인덱스
+CREATE INDEX idx_socratic_questions_module ON socratic_question_templates(module_id);
+CREATE INDEX idx_socratic_questions_type ON socratic_question_templates(question_type);
+
+-- 자동 업데이트 트리거
+CREATE TRIGGER update_socratic_question_templates_updated_at
+  BEFORE UPDATE ON socratic_question_templates
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
+-- 샘플 데이터 (Module 1 예시)
+INSERT INTO socratic_question_templates (module_id, question_type, question_text, question_text_en, purpose, order_index) VALUES
+-- Module 1: 좋은 질문이 좋은 답을 만든다 (Chain of Thought)
+((SELECT id FROM modules WHERE order_index = 1), 'exploration', 
+ '교수님께 질문할 때와 AI에게 질문할 때, 어떤 점이 비슷하고 다를까요?',
+ 'What similarities and differences do you see between asking a question to a professor versus asking AI?',
+ '기존 지식 및 경험 확인', 1),
+((SELECT id FROM modules WHERE order_index = 1), 'exploration',
+ '같은 주제에 대해 모호하게 질문하면 어떤 답을 받을 것 같나요?',
+ 'What kind of answer do you think you would get if you ask vaguely about the same topic?',
+ '프롬프트 품질과 응답 품질의 관계 인식', 2),
+((SELECT id FROM modules WHERE order_index = 1), 'clarification',
+ 'AI에게 질문할 때 무엇이 결과에 영향을 준다고 생각하나요?',
+ 'What do you think affects the results when asking questions to AI?',
+ '프롬프트 구성 요소 인식', 3),
+((SELECT id FROM modules WHERE order_index = 1), 'clarification',
+ '구체적으로 어떤 정보를 추가하면 더 나은 답변을 받을 수 있을까요?',
+ 'What specific information could you add to get a better answer?',
+ '맥락 정보의 중요성 인식', 4),
+((SELECT id FROM modules WHERE order_index = 1), 'assumption',
+ '왜 그렇게 생각하나요? 다른 가능성은 없을까요?',
+ 'Why do you think so? Are there no other possibilities?',
+ '가정 점검 및 비판적 사고', 5),
+((SELECT id FROM modules WHERE order_index = 1), 'consequence',
+ '이 프롬프트로 어떤 결과가 나올 것 같나요?',
+ 'What results do you expect from this prompt?',
+ '예측과 실제 비교를 통한 학습', 6),
+((SELECT id FROM modules WHERE order_index = 1), 'reflection',
+ '복잡한 문제를 "단계별로" 분석해달라고 하면 왜 더 좋은 답이 나올까요?',
+ 'Why do you get better answers when you ask to analyze complex problems "step by step"?',
+ 'Chain of Thought 테크닉 인식 유도', 7),
+
+-- Module 2: 문헌 리뷰 효과적으로 하기 (Few-shot + Output Structuring)
+((SELECT id FROM modules WHERE order_index = 2), 'exploration',
+ '문헌 리뷰할 때 가장 시간이 오래 걸리는 작업은 무엇인가요?',
+ 'What takes the most time when doing a literature review?',
+ '문제 상황 인식', 1),
+((SELECT id FROM modules WHERE order_index = 2), 'exploration',
+ 'AI가 논문을 요약해준다면, 어떤 정보가 포함되어야 유용할까요?',
+ 'If AI summarizes papers for you, what information should be included to be useful?',
+ '출력 형식의 중요성 인식', 2),
+((SELECT id FROM modules WHERE order_index = 2), 'clarification',
+ '원하는 형식을 AI에게 어떻게 전달하면 좋을까요?',
+ 'How should you convey the desired format to AI?',
+ '출력 구조화 필요성 인식', 3),
+((SELECT id FROM modules WHERE order_index = 2), 'reflection',
+ '예시를 하나 보여주는 것이 왜 효과적일까요? 몇 개의 예시가 적절할까요?',
+ 'Why is showing one example effective? How many examples are appropriate?',
+ 'Few-shot Learning 테크닉 인식 유도', 4),
+
+-- Module 3: 정책 비교 분석 요청하기 (CoT + Structuring + Self-Consistency)
+((SELECT id FROM modules WHERE order_index = 3), 'exploration',
+ '좋은 비교 분석에는 어떤 요소가 포함되어야 할까요?',
+ 'What elements should be included in a good comparative analysis?',
+ '분석 프레임워크 인식', 1),
+((SELECT id FROM modules WHERE order_index = 3), 'exploration',
+ '비교 기준 없이 "비교해줘"라고 하면 어떤 문제가 생길까요?',
+ 'What problems might arise if you just say "compare" without any criteria?',
+ '구조화된 요청의 필요성 인식', 2),
+((SELECT id FROM modules WHERE order_index = 3), 'clarification',
+ '분석 순서를 명시하면 결과가 어떻게 달라질까요?',
+ 'How would the results change if you specify the analysis order?',
+ '체계적 분석의 가치 인식', 3),
+((SELECT id FROM modules WHERE order_index = 3), 'reflection',
+ '분석 순서를 미리 알려주는 것과 AI가 알아서 하게 두는 것의 차이는?',
+ 'What is the difference between specifying the analysis order in advance versus letting AI decide?',
+ 'Self-Consistency 및 구조화 테크닉 인식 유도', 4),
+
+-- Module 4: 데이터 해석 도움받기 (Persona + CoT + Few-shot)
+((SELECT id FROM modules WHERE order_index = 4), 'exploration',
+ '데이터를 보여주기만 하면 AI가 당신의 연구 질문을 알 수 있을까요?',
+ 'Can AI know your research question just by showing the data?',
+ '맥락 제공의 중요성 인식', 1),
+((SELECT id FROM modules WHERE order_index = 4), 'clarification',
+ 'AI에게 "전문가" 정체성을 부여하면 어떤 차이가 있을까요?',
+ 'What difference does it make to give AI an "expert" identity?',
+ 'Persona 설정의 효과 인식', 2),
+((SELECT id FROM modules WHERE order_index = 4), 'assumption',
+ '모든 상황에서 전문가 페르소나가 효과적일까요?',
+ 'Is an expert persona effective in all situations?',
+ '테크닉의 적절한 사용 맥락 인식', 3),
+((SELECT id FROM modules WHERE order_index = 4), 'reflection',
+ 'AI에게 전문가 정체성을 부여하면 응답이 어떻게 달라지나요?',
+ 'How does the response change when you give AI an expert identity?',
+ 'Persona 테크닉 인식 유도', 4),
+
+-- Module 5: 정책 문서 작성 지원받기 (Persona + Few-shot + Constraints)
+((SELECT id FROM modules WHERE order_index = 5), 'exploration',
+ '정책 브리핑과 학술 논문의 문체는 어떻게 다른가요?',
+ 'How does the writing style differ between a policy briefing and an academic paper?',
+ '목적에 따른 문체 차이 인식', 1),
+((SELECT id FROM modules WHERE order_index = 5), 'exploration',
+ '독자가 누구인지 명시하면 AI 응답이 어떻게 달라질까요?',
+ 'How does specifying the reader change the AI response?',
+ '대상 독자 명시의 중요성 인식', 2),
+((SELECT id FROM modules WHERE order_index = 5), 'clarification',
+ '분량, 톤, 구성 등의 제약조건을 주면 어떤 효과가 있을까요?',
+ 'What effect does it have to give constraints like length, tone, and structure?',
+ 'Constraints 테크닉 인식', 3),
+((SELECT id FROM modules WHERE order_index = 5), 'reflection',
+ '지금까지 배운 방법들 중 가장 효과적이라고 느낀 것은 무엇인가요?',
+ 'What method have you found most effective among all that you have learned?',
+ '종합 학습 성찰', 4);
+```
+
+### 3.14 peer_reviews (Phase 3)
 
 ```sql
 CREATE TABLE peer_reviews (
@@ -456,11 +665,13 @@ CREATE INDEX idx_comparison_analysis ON comparisons USING GIN (analysis);
 3. user_roles 테이블
 4. modules 테이블 + 초기 데이터
 5. scenarios 테이블
-6. user_progress 테이블
-7. dialogues 테이블
-8. prompt_attempts 테이블
-9. comparisons 테이블
-10. reflections 테이블
-11. technique_badges 테이블
-12. peer_reviews 테이블 (Phase 3)
-13. 트리거 설정
+6. socratic_question_templates 테이블 + 초기 데이터
+7. user_progress 테이블
+8. dialogues 테이블
+9. prompt_attempts 테이블
+10. comparisons 테이블
+11. reflections 테이블
+12. technique_badges 테이블
+13. resources 테이블 + 초기 데이터
+14. peer_reviews 테이블 (Phase 3)
+15. 트리거 설정

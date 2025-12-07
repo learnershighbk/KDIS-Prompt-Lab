@@ -57,7 +57,7 @@ src/
 src/features/
 ├── auth/                         # 인증 피처
 │   ├── backend/
-│   │   ├── route.ts              # Hono 라우터 (/api/v1/auth/*)
+│   │   ├── route.ts              # Hono 라우터 (/api/auth/*)
 │   │   ├── service.ts            # 비즈니스 로직
 │   │   ├── schema.ts             # Zod 스키마
 │   │   └── error.ts              # 에러 코드
