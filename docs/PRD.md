@@ -524,11 +524,11 @@ Module 페이지 내부 스텝 (탭 또는 스테퍼)
 
 | 항목 | 기술 |
 |------|------|
-| Framework | Next.js 15 (App Router) |
-| UI Library | Tailwind CSS + shadcn/ui |
-| 상태 관리 | Zustand + TanStack Query |
-| 실시간 대화 | Streaming 지원 |
-| 차트/시각화 | Recharts |
+| Framework | Next.js 15 (App Router) + React 19 |
+| UI Library | Tailwind CSS 3.4 + shadcn/ui |
+| 상태 관리 | Zustand 5.x + TanStack Query 5.x |
+| 실시간 대화 | SSE Streaming 지원 |
+| 차트/시각화 | Recharts 2.x |
 
 ### 7.2 백엔드
 
@@ -550,96 +550,98 @@ Module 페이지 내부 스텝 (탭 또는 스테퍼)
 
 ### 7.4 데이터 모델 (핵심 테이블)
 
+> **참조**: 상세 스키마는 `DATABASE-SCHEMA.md` 참조
+
 ```sql
--- 사용자
-users (
+-- Supabase Auth 기반 사용자 (auth.users 참조)
+profiles (
+  id UUID PRIMARY KEY REFERENCES auth.users(id),
+  full_name TEXT,
+  avatar_url TEXT,
+  preferred_language TEXT DEFAULT 'ko',
+  student_id TEXT,
+  department TEXT
+)
+
+-- 역할 관리
+user_roles (
   id UUID PRIMARY KEY,
-  email TEXT UNIQUE,
-  name TEXT,
-  role TEXT, -- 'student', 'instructor', 'admin'
-  created_at TIMESTAMP
+  user_id UUID REFERENCES auth.users(id),
+  role user_role NOT NULL DEFAULT 'student' -- 'student', 'instructor', 'admin'
 )
 
 -- 모듈
 modules (
-  id SERIAL PRIMARY KEY,
-  title TEXT,
+  id UUID PRIMARY KEY,
+  title TEXT NOT NULL,
+  title_en TEXT,
   description TEXT,
-  order_index INT,
-  embedded_techniques TEXT[] -- ['cot', 'few-shot', 'persona']
+  techniques TEXT[], -- ['Chain of Thought', 'Few-shot']
+  policy_context TEXT,
+  order_index INTEGER,
+  prerequisite_module_id UUID REFERENCES modules(id)
 )
 
 -- 시나리오
 scenarios (
-  id SERIAL PRIMARY KEY,
-  module_id INT REFERENCES modules(id),
-  category TEXT,
-  situation_text TEXT,
-  improved_prompt TEXT,
-  socratic_questions JSONB
-)
-
--- 학습 세션
-learning_sessions (
   id UUID PRIMARY KEY,
-  user_id UUID REFERENCES users(id),
-  module_id INT REFERENCES modules(id),
-  scenario_id INT REFERENCES scenarios(id),
-  current_step INT DEFAULT 1, -- 1~4
-  started_at TIMESTAMP,
-  completed_at TIMESTAMP
-)
-
--- 프롬프트 비교 기록
-prompt_comparisons (
-  id UUID PRIMARY KEY,
-  session_id UUID REFERENCES learning_sessions(id),
-  user_prompt TEXT,
-  improved_prompt TEXT,
-  user_response TEXT,
-  improved_response TEXT,
-  analysis_result JSONB,
-  created_at TIMESTAMP
-)
-
--- 성찰 저널
-reflections (
-  id UUID PRIMARY KEY,
-  session_id UUID REFERENCES learning_sessions(id),
-  user_id UUID REFERENCES users(id),
-  reflection_text TEXT,
-  created_at TIMESTAMP
+  module_id UUID REFERENCES modules(id),
+  category scenario_category NOT NULL,
+  title TEXT,
+  context TEXT,
+  improved_prompt_example TEXT
 )
 
 -- 학습 진도
 user_progress (
   id UUID PRIMARY KEY,
-  user_id UUID REFERENCES users(id),
-  module_id INT REFERENCES modules(id),
-  step_completed INT DEFAULT 0, -- 0~4
-  is_completed BOOLEAN DEFAULT false,
-  completed_at TIMESTAMP,
-  updated_at TIMESTAMP
+  user_id UUID REFERENCES auth.users(id),
+  module_id UUID REFERENCES modules(id),
+  current_step step_type DEFAULT 'socratic_dialogue',
+  status progress_status DEFAULT 'not_started'
 )
 
--- 획득 테크닉
-user_techniques (
+-- 대화 기록
+dialogues (
   id UUID PRIMARY KEY,
-  user_id UUID REFERENCES users(id),
-  technique_name TEXT, -- 'cot', 'few-shot', 'persona', etc.
-  acquired_at TIMESTAMP,
-  source_module_id INT REFERENCES modules(id)
+  progress_id UUID REFERENCES user_progress(id),
+  messages JSONB NOT NULL DEFAULT '[]',
+  is_completed BOOLEAN DEFAULT false
 )
 
--- 학습 리소스
-resources (
-  id SERIAL PRIMARY KEY,
-  category TEXT, -- 'guide', 'youtube', 'course', 'paper'
-  title TEXT,
-  url TEXT,
-  description TEXT,
-  language TEXT,
-  is_active BOOLEAN DEFAULT true
+-- 프롬프트 시도
+prompt_attempts (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id),
+  scenario_id UUID REFERENCES scenarios(id),
+  user_prompt TEXT NOT NULL,
+  ai_response TEXT
+)
+
+-- 비교 결과
+comparisons (
+  id UUID PRIMARY KEY,
+  attempt_id UUID REFERENCES prompt_attempts(id),
+  improved_prompt TEXT,
+  improved_response TEXT,
+  analysis JSONB NOT NULL
+)
+
+-- 성찰 저널
+reflections (
+  id UUID PRIMARY KEY,
+  progress_id UUID REFERENCES user_progress(id),
+  content TEXT NOT NULL,
+  insights JSONB DEFAULT '{}'
+)
+
+-- 테크닉 배지
+technique_badges (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id),
+  technique_name TEXT NOT NULL,
+  module_id UUID REFERENCES modules(id),
+  earned_at TIMESTAMPTZ DEFAULT NOW()
 )
 ```
 

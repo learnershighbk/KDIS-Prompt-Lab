@@ -36,10 +36,12 @@
 
 ## 2. Zustand Stores
 
+> **참조**: AGENTS.md 디렉토리 구조 기준. 피처별 스토어는 `src/features/[feature]/stores/` 에 위치
+
 ### 2.1 Auth Store
 
 ```typescript
-// src/stores/auth.store.ts
+// src/features/auth/stores/auth.store.ts
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
@@ -251,7 +253,7 @@ export const useAuthStore = create<AuthState>()(
 ### 2.2 Progress Store
 
 ```typescript
-// src/stores/progress.store.ts
+// src/features/progress/stores/progress.store.ts
 
 import { create } from 'zustand';
 import type { 
@@ -406,7 +408,7 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
 ### 2.3 Dialogue Store
 
 ```typescript
-// src/stores/dialogue.store.ts
+// src/features/socratic-dialogue/stores/dialogue.store.ts
 
 import { create } from 'zustand';
 import type { Dialogue, DialogueMessage } from '@/domain/entities/dialogue.entity';
@@ -479,10 +481,10 @@ export const useDialogueStore = create<DialogueState>((set, get) => ({
 }));
 ```
 
-### 2.4 UI Store
+### 2.4 UI Store (공통)
 
 ```typescript
-// src/stores/ui.store.ts
+// src/stores/ui.store.ts (공통 UI 상태는 src/stores에 위치)
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
@@ -630,7 +632,7 @@ export function useModule(moduleId: string) {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/query-keys';
 import { progressService } from '@/services/progress.service';
-import { useProgressStore } from '@/stores/progress.store';
+import { useProgressStore } from '@/features/progress/stores/progress.store';
 import type { StepType } from '@/domain/entities/progress.entity';
 
 export function useOverallProgress() {
@@ -674,7 +676,7 @@ export function useCompleteStep() {
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/infrastructure/supabase/client';
-import { useAuthStore } from '@/stores/auth.store';
+import { useAuthStore } from '@/features/auth/stores/auth.store';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();

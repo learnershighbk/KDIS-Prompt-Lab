@@ -16,10 +16,12 @@ pages/        → 실제 페이지 (app/ 디렉토리)
 
 | 유형 | 위치 | 역할 |
 |------|------|------|
-| UI Components | `src/components/ui/` | 재사용 가능한 기본 UI |
-| Feature Components | `src/components/features/` | 비즈니스 로직 포함 |
+| UI Components | `src/components/ui/` | 재사용 가능한 기본 UI (shadcn/ui) |
+| Feature Components | `src/features/[feature]/components/` | 비즈니스 로직 포함 (피처별) |
 | Layout Components | `src/components/layouts/` | 페이지 구조 |
 | Common Components | `src/components/common/` | 공통 유틸리티 |
+
+> **참조**: AGENTS.md 디렉토리 구조 기준. 피처 컴포넌트는 `src/features/[featureName]/components/` 에 위치
 
 ## 2. UI 컴포넌트 (shadcn/ui 기반)
 
@@ -109,7 +111,7 @@ export function StepProgress({
 ### 3.1 인증 (Auth)
 
 ```typescript
-// src/components/features/auth/login-form.tsx
+// src/features/auth/components/login-form.tsx
 
 'use client';
 
@@ -177,13 +179,13 @@ export function LoginForm() {
 ```
 
 ```typescript
-// src/components/features/auth/auth-guard.tsx
+// src/features/auth/components/auth-guard.tsx
 
 'use client';
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/stores/auth.store';
+import { useAuthStore } from '@/features/auth/stores/auth.store';
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -219,7 +221,7 @@ export function AuthGuard({ children, requiredRole }: AuthGuardProps) {
 ### 3.2 모듈 (Modules)
 
 ```typescript
-// src/components/features/modules/module-card.tsx
+// src/features/modules/components/module-card.tsx
 
 import Link from 'next/link';
 import { Lock, CheckCircle, Circle, PlayCircle } from 'lucide-react';
@@ -301,7 +303,7 @@ export function ModuleCard({ module }: ModuleCardProps) {
 ```
 
 ```typescript
-// src/components/features/modules/step-indicator.tsx
+// src/features/modules/components/step-indicator.tsx
 
 import { Check, Circle, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -382,7 +384,7 @@ export function StepIndicator({
 ### 3.3 소크라테스 대화 (Socratic Dialogue)
 
 ```typescript
-// src/components/features/socratic-dialogue/dialogue-container.tsx
+// src/features/socratic-dialogue/components/dialogue-container.tsx
 
 'use client';
 
@@ -462,7 +464,7 @@ export function DialogueContainer({ progressId, onComplete }: DialogueContainerP
 ```
 
 ```typescript
-// src/components/features/socratic-dialogue/chat-bubble.tsx
+// src/features/socratic-dialogue/components/chat-bubble.tsx
 
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui';
@@ -524,7 +526,7 @@ export function ChatBubble({ message, isStreaming }: ChatBubbleProps) {
 ### 3.4 비교 실험실 (Comparison Lab)
 
 ```typescript
-// src/components/features/comparison-lab/comparison-panel.tsx
+// src/features/comparison-lab/components/comparison-panel.tsx
 
 'use client';
 
@@ -603,7 +605,7 @@ export function ComparisonPanel({ comparison }: ComparisonPanelProps) {
 ```
 
 ```typescript
-// src/components/features/comparison-lab/analysis-chart.tsx
+// src/features/comparison-lab/components/analysis-chart.tsx
 
 'use client';
 
@@ -670,7 +672,7 @@ export function AnalysisChart({ analysis }: AnalysisChartProps) {
 ### 3.5 성찰 저널 (Reflection Journal)
 
 ```typescript
-// src/components/features/reflection-journal/reflection-form.tsx
+// src/features/reflection-journal/components/reflection-form.tsx
 
 'use client';
 
@@ -765,7 +767,7 @@ export function ReflectionForm({
 ### 3.6 진도 관리 (Progress)
 
 ```typescript
-// src/components/features/progress/progress-overview.tsx
+// src/features/progress/components/progress-overview.tsx
 
 import { Card, CardHeader, CardTitle, CardContent, Progress } from '@/components/ui';
 import { BadgeDisplay } from './badge-display';
