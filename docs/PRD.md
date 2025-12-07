@@ -524,11 +524,11 @@ Module 페이지 내부 스텝 (탭 또는 스테퍼)
 
 | 항목 | 기술 |
 |------|------|
-| Framework | Next.js 14 (App Router) |
+| Framework | Next.js 15 (App Router) |
 | UI Library | Tailwind CSS + shadcn/ui |
-| 상태 관리 | React Context / Zustand |
+| 상태 관리 | Zustand + TanStack Query |
 | 실시간 대화 | Streaming 지원 |
-| 차트/시각화 | Recharts 또는 Chart.js |
+| 차트/시각화 | Recharts |
 
 ### 7.2 백엔드
 

@@ -22,108 +22,93 @@ Prompt Lab은 **레이어드 아키텍처(Layered Architecture)**를 기반으�
 
 ## 2. 레이어별 책임
 
+본 프로젝트는 **피처 기반 모듈 구조**를 채택하여, 각 기능이 독립적인 모듈로 구성됩니다.
+
 ### 2.1 Presentation Layer (프레젠테이션 계층)
 
 **책임**: UI 렌더링, 사용자 상호작용 처리
 
-**위치**: `src/components/`, `src/app/`
+**위치**: `src/app/`, `src/components/`, `src/features/[feature]/components/`
 
 ```
 src/
 ├── app/                          # Next.js App Router
-│   ├── (auth)/                   # 인증 관련 라우트 그룹
-│   │   ├── login/
-│   │   └── register/
-│   ├── (dashboard)/              # 대시보드 라우트 그룹
+│   ├── (protected)/              # 인증 필요 라우트 그룹
+│   │   ├── dashboard/
 │   │   ├── modules/
-│   │   ├── journal/
-│   │   └── resources/
-│   ├── (instructor)/             # 교수자 라우트 그룹
-│   └── api/                      # API Routes
+│   │   ├── mypage/
+│   │   └── instructor/
+│   ├── api/[[...hono]]/          # Hono 위임 API Routes
+│   ├── login/
+│   └── signup/
 ├── components/
 │   ├── ui/                       # 기본 UI 컴포넌트 (shadcn/ui)
-│   ├── features/                 # 기능별 컴포넌트
-│   │   ├── socratic-dialogue/
-│   │   ├── prompt-lab/
-│   │   ├── comparison-lab/
-│   │   └── reflection-journal/
-│   └── layouts/                  # 레이아웃 컴포넌트
+│   ├── layouts/                  # 레이아웃 컴포넌트
+│   └── common/                   # 공통 유틸 컴포넌트
 ```
 
-### 2.2 Application Layer (애플리케이션 계층)
+### 2.2 Feature Layer (피처 계층) - 핵심
 
-**책임**: 유스케이스 구현, 비즈니스 로직 조율
+**책임**: 피처별 백엔드/프론트엔드 통합 모듈
 
-**위치**: `src/services/`, `src/hooks/`, `src/stores/`
+**위치**: `src/features/[featureName]/`
+
+```
+src/features/
+├── auth/                         # 인증 피처
+│   ├── backend/
+│   │   ├── route.ts              # Hono 라우터 (/api/v1/auth/*)
+│   │   ├── service.ts            # 비즈니스 로직
+│   │   ├── schema.ts             # Zod 스키마
+│   │   └── error.ts              # 에러 코드
+│   ├── components/
+│   ├── hooks/
+│   └── types.ts
+├── modules/                      # 학습 모듈 피처
+├── dialogue/                     # 소크라테스 대화 피처
+├── prompt-lab/                   # 프롬프트 작성 피처
+├── comparison/                   # 비교 실험실 피처
+├── reflection/                   # 성찰 저널 피처
+├── progress/                     # 진도 관리 피처
+└── instructor/                   # 교수자 기능 피처
+```
+
+### 2.3 Backend Layer (백엔드 계층)
+
+**책임**: 공통 서버 사이드 로직 (Hono 기반)
+
+**위치**: `src/backend/`
+
+```
+src/backend/
+├── config/                       # 환경 변수 파싱 (Zod)
+├── hono/
+│   ├── app.ts                    # Hono 앱 생성 (싱글턴)
+│   └── context.ts                # AppEnv 타입 정의
+├── http/
+│   └── response.ts               # success/failure/respond 헬퍼
+├── middleware/
+│   ├── context.ts                # withAppContext 미들웨어
+│   ├── error.ts                  # errorBoundary 미들웨어
+│   └── supabase.ts               # withSupabase 미들웨어
+└── supabase/
+    └── client.ts                 # Supabase 서버 클라이언트
+```
+
+### 2.4 Shared Layer (공유 계층)
+
+**책임**: 공통 유틸리티, 타입, 상수
+
+**위치**: `src/lib/`, `src/hooks/`, `src/constants/`
 
 ```
 src/
-├── services/                     # 비즈니스 서비스
-│   ├── auth.service.ts
-│   ├── module.service.ts
-│   ├── dialogue.service.ts
-│   ├── comparison.service.ts
-│   └── progress.service.ts
-├── hooks/                        # Custom Hooks
-│   ├── useAuth.ts
-│   ├── useModule.ts
-│   ├── useDialogue.ts
-│   └── useProgress.ts
-└── stores/                       # Zustand 상태 관리
-    ├── auth.store.ts
-    ├── module.store.ts
-    └── progress.store.ts
-```
-
-### 2.3 Domain Layer (도메인 계층)
-
-**책임**: 핵심 비즈니스 엔티티, 인터페이스 정의
-
-**위치**: `src/domain/`
-
-```
-src/domain/
-├── entities/                     # 도메인 엔티티
-│   ├── user.entity.ts
-│   ├── module.entity.ts
-│   ├── scenario.entity.ts
-│   ├── prompt.entity.ts
-│   ├── dialogue.entity.ts
-│   └── progress.entity.ts
-├── interfaces/                   # 인터페이스 정의
-│   ├── repositories/
-│   │   ├── user.repository.ts
-│   │   ├── module.repository.ts
-│   │   └── progress.repository.ts
-│   └── services/
-│       ├── ai.service.ts
-│       └── analytics.service.ts
-└── value-objects/                # 값 객체
-    ├── prompt-analysis.vo.ts
-    └── learning-step.vo.ts
-```
-
-### 2.4 Infrastructure Layer (인프라스트럭처 계층)
-
-**책임**: 외부 시스템 연동, 데이터 저장소
-
-**위치**: `src/infrastructure/`
-
-```
-src/infrastructure/
-├── supabase/                     # Supabase 클라이언트
-│   ├── client.ts
-│   └── admin.ts
-├── repositories/                 # Repository 구현체
-│   ├── supabase-user.repository.ts
-│   ├── supabase-module.repository.ts
-│   └── supabase-progress.repository.ts
-├── ai/                           # AI 서비스 구현
-│   ├── anthropic.client.ts
-│   ├── socratic-engine.ts
-│   └── prompt-analyzer.ts
-└── external/                     # 외부 서비스
-    └── analytics.ts
+├── lib/
+│   ├── remote/api-client.ts      # HTTP 클라이언트
+│   ├── supabase/                 # Supabase 브라우저 클라이언트
+│   └── utils.ts                  # cn() 등 공통 유틸
+├── hooks/                        # 공통 커스텀 훅
+└── constants/                    # 공통 상수
 ```
 
 ## 3. SOLID 원칙 적용
@@ -285,18 +270,22 @@ const moduleService = new ModuleService(
 │                    Client (Browser)                          │
 ├─────────────────────────────────────────────────────────────┤
 │  Supabase Auth (JWT)                                        │
-│  - Row Level Security (RLS)                                 │
 │  - Session Management                                        │
+│  - Token Refresh                                            │
 ├─────────────────────────────────────────────────────────────┤
-│                    API Routes                                │
-│  - Auth Middleware                                          │
+│                    API Routes (Hono)                         │
+│  - Auth Middleware (JWT 검증)                               │
+│  - Role-based Access Control (애플리케이션 레벨)            │
 │  - Rate Limiting                                            │
 ├─────────────────────────────────────────────────────────────┤
 │                    Supabase Backend                          │
-│  - RLS Policies                                             │
+│  - RLS 비활성화 (애플리케이션 레벨 권한 관리)               │
+│  - Service Role Key 사용                                    │
 │  - API Key Protection                                       │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+> **Note**: RLS는 비활성화하고, 모든 권한 관리는 Hono 미들웨어에서 애플리케이션 레벨로 처리합니다.
 
 ## 8. 확장성 고려사항
 
