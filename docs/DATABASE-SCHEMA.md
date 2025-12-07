@@ -2,7 +2,7 @@
 
 ## 1. 개요
 
-Supabase(PostgreSQL)를 사용하며, Row Level Security(RLS)를 적용합니다.
+Supabase(PostgreSQL)를 사용합니다. RLS(Row Level Security)는 사용하지 않으며, 애플리케이션 레벨에서 권한을 관리합니다.
 
 ## 2. ERD (Entity Relationship Diagram)
 
@@ -96,16 +96,8 @@ CREATE TABLE profiles (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- RLS 정책
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can view own profile"
-  ON profiles FOR SELECT
-  USING (auth.uid() = id);
-
-CREATE POLICY "Users can update own profile"
-  ON profiles FOR UPDATE
-  USING (auth.uid() = id);
+-- RLS 비활성화 (애플리케이션 레벨에서 권한 관리)
+ALTER TABLE profiles DISABLE ROW LEVEL SECURITY;
 
 -- 자동 업데이트 트리거
 CREATE TRIGGER update_profiles_updated_at
@@ -128,21 +120,8 @@ CREATE TABLE user_roles (
   UNIQUE(user_id, role)
 );
 
--- RLS 정책
-ALTER TABLE user_roles ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can view own roles"
-  ON user_roles FOR SELECT
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "Admins can manage roles"
-  ON user_roles FOR ALL
-  USING (
-    EXISTS (
-      SELECT 1 FROM user_roles
-      WHERE user_id = auth.uid() AND role = 'admin'
-    )
-  );
+-- RLS 비활성화 (애플리케이션 레벨에서 권한 관리)
+ALTER TABLE user_roles DISABLE ROW LEVEL SECURITY;
 ```
 
 ### 3.4 modules
@@ -176,13 +155,8 @@ INSERT INTO modules (title, title_en, techniques, policy_context, order_index) V
 ('정책 문서 작성 지원받기', 'Policy Document Writing Support', 
  ARRAY['Persona', 'Few-shot Learning', 'Constraints'], '브리핑/메모/제안서', 5);
 
--- RLS 정책 (모든 인증된 사용자 읽기 가능)
-ALTER TABLE modules ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Authenticated users can view modules"
-  ON modules FOR SELECT
-  TO authenticated
-  USING (is_active = true);
+-- RLS 비활성화 (애플리케이션 레벨에서 권한 관리)
+ALTER TABLE modules DISABLE ROW LEVEL SECURITY;
 ```
 
 ### 3.5 scenarios
@@ -239,20 +213,8 @@ CREATE TABLE user_progress (
   UNIQUE(user_id, module_id)
 );
 
--- RLS 정책
-ALTER TABLE user_progress ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can view own progress"
-  ON user_progress FOR SELECT
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can update own progress"
-  ON user_progress FOR UPDATE
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can insert own progress"
-  ON user_progress FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
+-- RLS 비활성화 (애플리케이션 레벨에서 권한 관리)
+ALTER TABLE user_progress DISABLE ROW LEVEL SECURITY;
 
 -- 인덱스
 CREATE INDEX idx_progress_user ON user_progress(user_id);
@@ -273,18 +235,8 @@ CREATE TABLE dialogues (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- RLS (user_progress를 통한 간접 접근)
-ALTER TABLE dialogues ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can access own dialogues"
-  ON dialogues FOR ALL
-  USING (
-    EXISTS (
-      SELECT 1 FROM user_progress
-      WHERE user_progress.id = dialogues.progress_id
-      AND user_progress.user_id = auth.uid()
-    )
-  );
+-- RLS 비활성화 (애플리케이션 레벨에서 권한 관리)
+ALTER TABLE dialogues DISABLE ROW LEVEL SECURITY;
 ```
 
 ### 3.8 prompt_attempts
@@ -302,12 +254,8 @@ CREATE TABLE prompt_attempts (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- RLS
-ALTER TABLE prompt_attempts ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can access own attempts"
-  ON prompt_attempts FOR ALL
-  USING (auth.uid() = user_id);
+-- RLS 비활성화 (애플리케이션 레벨에서 권한 관리)
+ALTER TABLE prompt_attempts DISABLE ROW LEVEL SECURITY;
 
 -- 인덱스
 CREATE INDEX idx_attempts_user ON prompt_attempts(user_id);
@@ -335,18 +283,8 @@ CREATE TABLE comparisons (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- RLS (prompt_attempts를 통한 간접 접근)
-ALTER TABLE comparisons ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can access own comparisons"
-  ON comparisons FOR ALL
-  USING (
-    EXISTS (
-      SELECT 1 FROM prompt_attempts
-      WHERE prompt_attempts.id = comparisons.attempt_id
-      AND prompt_attempts.user_id = auth.uid()
-    )
-  );
+-- RLS 비활성화 (애플리케이션 레벨에서 권한 관리)
+ALTER TABLE comparisons DISABLE ROW LEVEL SECURITY;
 ```
 
 ### 3.10 reflections
@@ -362,18 +300,8 @@ CREATE TABLE reflections (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- RLS
-ALTER TABLE reflections ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can access own reflections"
-  ON reflections FOR ALL
-  USING (
-    EXISTS (
-      SELECT 1 FROM user_progress
-      WHERE user_progress.id = reflections.progress_id
-      AND user_progress.user_id = auth.uid()
-    )
-  );
+-- RLS 비활성화 (애플리케이션 레벨에서 권한 관리)
+ALTER TABLE reflections DISABLE ROW LEVEL SECURITY;
 ```
 
 ### 3.11 technique_badges
@@ -388,16 +316,8 @@ CREATE TABLE technique_badges (
   UNIQUE(user_id, technique_name)
 );
 
--- RLS
-ALTER TABLE technique_badges ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can view own badges"
-  ON technique_badges FOR SELECT
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "System can insert badges"
-  ON technique_badges FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
+-- RLS 비활성화 (애플리케이션 레벨에서 권한 관리)
+ALTER TABLE technique_badges DISABLE ROW LEVEL SECURITY;
 ```
 
 ### 3.12 peer_reviews (Phase 3)
@@ -416,19 +336,8 @@ CREATE TABLE peer_reviews (
   UNIQUE(attempt_id, reviewer_id)
 );
 
--- RLS
-ALTER TABLE peer_reviews ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can view reviews of own attempts"
-  ON peer_reviews FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM prompt_attempts
-      WHERE prompt_attempts.id = peer_reviews.attempt_id
-      AND prompt_attempts.user_id = auth.uid()
-    )
-    OR reviewer_id = auth.uid()
-  );
+-- RLS 비활성화 (애플리케이션 레벨에서 권한 관리)
+ALTER TABLE peer_reviews DISABLE ROW LEVEL SECURITY;
 ```
 
 ## 4. 함수 및 트리거

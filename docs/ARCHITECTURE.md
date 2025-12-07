@@ -16,7 +16,7 @@ Prompt Lab은 **레이어드 아키텍처(Layered Architecture)**를 기반으�
 │  (Entities, Business Logic, Interfaces)                     │
 ├─────────────────────────────────────────────────────────────┤
 │                   Infrastructure Layer                       │
-│  (Supabase, OpenAI API, External Services)                  │
+│  (Supabase, Anthropic Claude API, External Services)        │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -119,7 +119,7 @@ src/infrastructure/
 │   ├── supabase-module.repository.ts
 │   └── supabase-progress.repository.ts
 ├── ai/                           # AI 서비스 구현
-│   ├── openai.client.ts
+│   ├── anthropic.client.ts
 │   ├── socratic-engine.ts
 │   └── prompt-analyzer.ts
 └── external/                     # 외부 서비스
@@ -178,11 +178,7 @@ interface AIService {
   generateResponse(prompt: string): Promise<string>;
 }
 
-class OpenAIService implements AIService {
-  generateResponse(prompt: string): Promise<string>;
-}
-
-class ClaudeService implements AIService {
+class AnthropicService implements AIService {
   generateResponse(prompt: string): Promise<string>;
 }
 ```
@@ -221,7 +217,7 @@ class ModuleService {
 // 의존성 주입
 const moduleService = new ModuleService(
   new SupabaseModuleRepository(),
-  new OpenAIService()
+  new AnthropicService()
 );
 ```
 
@@ -233,7 +229,7 @@ const moduleService = new ModuleService(
 │      ↓                                                          │
 │  React Component → Custom Hook → Service → Repository            │
 │      ↓                                                          │
-│  Supabase / OpenAI API                                          │
+│  Supabase / Anthropic Claude API                                │
 │      ↓                                                          │
 │  Repository → Service → Zustand Store → React Component         │
 │      ↓                                                          │
@@ -280,7 +276,7 @@ const moduleService = new ModuleService(
 | Presentation | Next.js 15, React 19, Tailwind CSS, shadcn/ui |
 | Application | Zustand, React Query, Custom Hooks |
 | Domain | TypeScript Interfaces, Zod Validation |
-| Infrastructure | Supabase, OpenAI API, Vercel |
+| Infrastructure | Supabase, Anthropic Claude API, Vercel |
 
 ## 7. 보안 아키텍처
 

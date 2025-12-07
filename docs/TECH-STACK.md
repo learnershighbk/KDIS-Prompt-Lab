@@ -47,10 +47,10 @@ Supabase
 
 ### AI Integration
 ```
-OpenAI API
-├── GPT-4 Turbo / GPT-4o
+Anthropic Claude API
+├── Claude 3.5 Sonnet / Claude 3 Opus
 ├── Streaming (Server-Sent Events)
-└── Function Calling
+└── Tool Use (Function Calling)
 ```
 
 ## 2. 개발 도구
@@ -99,7 +99,7 @@ Claude Code (CLI)
     "@tanstack/react-query": "^5.50.0",
     "zustand": "^5.0.0",
     "zod": "^3.23.0",
-    "openai": "^4.50.0"
+    "@anthropic-ai/sdk": "^0.30.0"
   }
 }
 ```
@@ -379,7 +379,7 @@ export default config;
     }
   },
   "env": {
-    "OPENAI_API_KEY": "@openai-api-key",
+    "ANTHROPIC_API_KEY": "@anthropic-api-key",
     "SUPABASE_SERVICE_ROLE_KEY": "@supabase-service-key"
   }
 }
@@ -391,7 +391,7 @@ Vercel Dashboard → Settings → Environment Variables
 ├── NEXT_PUBLIC_SUPABASE_URL
 ├── NEXT_PUBLIC_SUPABASE_ANON_KEY
 ├── SUPABASE_SERVICE_ROLE_KEY
-├── OPENAI_API_KEY
+├── ANTHROPIC_API_KEY
 └── NEXT_PUBLIC_APP_URL
 ```
 

@@ -4,33 +4,42 @@
 
 ```
 prompt-lab/
-├── .cursor/                      # Cursor AI 설정
-│   └── rules/                    # Ruler 규칙 파일
+├── .ruler/                       # Ruler 규칙 파일
 ├── claude/                       # Claude Code 에이전트 설정
 │   └── agents/                   # 에이전트별 지침
 ├── docs/                         # 프로젝트 문서
 ├── prompts/                      # AI 시스템 프롬프트
 ├── public/                       # 정적 파일
-│   ├── images/
-│   └── locales/                  # i18n 번역 파일
+│   └── images/
 ├── src/
 │   ├── app/                      # Next.js App Router
-│   ├── components/               # React 컴포넌트
-│   ├── domain/                   # 도메인 레이어
-│   ├── hooks/                    # Custom React Hooks
-│   ├── infrastructure/           # 인프라 레이어
-│   ├── lib/                      # 유틸리티 라이브러리
-│   ├── services/                 # 애플리케이션 서비스
-│   ├── stores/                   # Zustand 상태 관리
-│   ├── styles/                   # 전역 스타일
-│   └── types/                    # TypeScript 타입 정의
+│   ├── backend/                  # 서버 사이드 로직 (Hono)
+│   │   ├── config/               # 환경 변수 파싱
+│   │   ├── hono/                 # Hono 앱 본체
+│   │   ├── http/                 # 응답 포맷 유틸
+│   │   ├── middleware/           # 공통 미들웨어
+│   │   └── supabase/             # Supabase 서버 클라이언트
+│   ├── components/               # 공통 컴포넌트
+│   │   └── ui/                   # shadcn/ui 컴포넌트
+│   ├── constants/                # 공통 상수
+│   ├── features/                 # 피처 기반 모듈
+│   │   └── [featureName]/
+│   │       ├── backend/          # 피처별 백엔드
+│   │       ├── components/       # 피처별 컴포넌트
+│   │       ├── constants/        # 피처별 상수
+│   │       ├── hooks/            # 피처별 훅
+│   │       ├── lib/              # 피처별 유틸/DTO
+│   │       └── types.ts          # 피처별 타입
+│   ├── hooks/                    # 공통 커스텀 훅
+│   └── lib/                      # 공통 유틸리티
+│       ├── remote/               # API 클라이언트
+│       ├── supabase/             # Supabase 브라우저 클라이언트
+│       └── utils.ts
 ├── supabase/                     # Supabase 설정
-│   ├── migrations/               # DB 마이그레이션
-│   └── seed.sql                  # 초기 데이터
-├── tests/                        # 테스트 파일
+│   └── migrations/               # DB 마이그레이션
 ├── .env.local                    # 환경 변수 (로컬)
 ├── .env.example                  # 환경 변수 예시
-├── next.config.js                # Next.js 설정
+├── next.config.ts                # Next.js 설정
 ├── tailwind.config.ts            # Tailwind 설정
 ├── tsconfig.json                 # TypeScript 설정
 └── package.json
@@ -40,89 +49,51 @@ prompt-lab/
 
 ```
 src/app/
-├── (auth)/                       # 인증 라우트 그룹
-│   ├── login/
-│   │   └── page.tsx
-│   ├── register/
-│   │   └── page.tsx
-│   ├── forgot-password/
-│   │   └── page.tsx
-│   └── layout.tsx                # 인증 페이지 공통 레이아웃
-│
-├── (dashboard)/                  # 대시보드 라우트 그룹 (인증 필요)
-│   ├── layout.tsx                # 대시보드 공통 레이아웃
-│   ├── page.tsx                  # 메인 대시보드 (/)
-│   │
+├── (protected)/                  # 인증 필요 라우트 그룹
+│   ├── layout.tsx                # 인증 체크 레이아웃
+│   ├── dashboard/
+│   │   └── page.tsx              # 메인 대시보드
 │   ├── modules/
 │   │   ├── page.tsx              # 모듈 목록 (/modules)
 │   │   └── [moduleId]/
-│   │       ├── page.tsx          # 모듈 상세 (/modules/[id])
-│   │       └── [step]/
-│   │           └── page.tsx      # 학습 스텝 (/modules/[id]/[step])
-│   │
+│   │       └── page.tsx          # 모듈 상세 (/modules/[id])
 │   ├── journal/
-│   │   ├── page.tsx              # 성찰 저널 목록 (/journal)
+│   │   ├── page.tsx              # 성찰 저널 목록
 │   │   └── [reflectionId]/
-│   │       └── page.tsx          # 저널 상세 (/journal/[id])
-│   │
+│   │       └── page.tsx          # 저널 상세
 │   ├── resources/
-│   │   └── page.tsx              # 학습 리소스 (/resources)
-│   │
-│   ├── profile/
-│   │   └── page.tsx              # 프로필 설정 (/profile)
-│   │
-│   └── progress/
-│       └── page.tsx              # 진도 상세 (/progress)
+│   │   └── page.tsx              # 학습 리소스
+│   ├── mypage/
+│   │   ├── progress/
+│   │   │   └── page.tsx          # 내 학습 진도
+│   │   ├── journals/
+│   │   │   └── page.tsx          # 성찰 저널 목록
+│   │   ├── prompts/
+│   │   │   └── page.tsx          # 프롬프트 히스토리
+│   │   └── profile/
+│   │       └── page.tsx          # 프로필 설정
+│   └── instructor/               # 교수자 전용 (권한 체크)
+│       ├── page.tsx              # 교수자 대시보드
+│       ├── students/
+│       │   └── page.tsx          # 학생 진도 관리
+│       ├── scenarios/
+│       │   └── page.tsx          # 시나리오 관리
+│       └── reviews/
+│           └── page.tsx          # 성찰 저널 리뷰
 │
-├── (instructor)/                 # 교수자 라우트 그룹
-│   ├── layout.tsx
-│   ├── dashboard/
-│   │   └── page.tsx              # 교수자 대시보드
-│   ├── students/
-│   │   └── page.tsx              # 학생 관리
-│   └── scenarios/
-│       ├── page.tsx              # 시나리오 목록
-│       └── [scenarioId]/
-│           └── page.tsx          # 시나리오 편집
+├── api/                          # API Routes (Hono 위임)
+│   └── [[...hono]]/
+│       └── route.ts              # Hono 앱 핸들러
 │
-├── api/                          # API Routes
-│   └── v1/
-│       ├── auth/
-│       │   ├── login/route.ts
-│       │   ├── register/route.ts
-│       │   ├── logout/route.ts
-│       │   └── refresh/route.ts
-│       ├── modules/
-│       │   ├── route.ts          # GET /modules
-│       │   └── [moduleId]/
-│       │       ├── route.ts      # GET /modules/[id]
-│       │       └── start/route.ts
-│       ├── dialogues/
-│       │   ├── route.ts          # POST /dialogues
-│       │   └── [dialogueId]/
-│       │       ├── route.ts      # GET /dialogues/[id]
-│       │       └── messages/route.ts
-│       ├── prompts/
-│       │   ├── submit/route.ts
-│       │   └── attempts/route.ts
-│       ├── comparisons/
-│       │   └── route.ts
-│       ├── reflections/
-│       │   └── route.ts
-│       ├── progress/
-│       │   ├── route.ts
-│       │   └── [progressId]/
-│       │       └── complete-step/route.ts
-│       ├── ai/
-│       │   └── stream/
-│       │       ├── dialogue/route.ts
-│       │       └── prompt/route.ts
-│       └── instructor/
-│           ├── students/route.ts
-│           └── scenarios/route.ts
+├── login/
+│   └── page.tsx                  # 로그인
+├── signup/
+│   └── page.tsx                  # 회원가입
 │
 ├── globals.css                   # 전역 CSS
 ├── layout.tsx                    # 루트 레이아웃
+├── providers.tsx                 # 전역 프로바이더
+├── page.tsx                      # 랜딩 페이지 (/)
 ├── loading.tsx                   # 전역 로딩 UI
 ├── error.tsx                     # 전역 에러 UI
 └── not-found.tsx                 # 404 페이지
@@ -130,264 +101,261 @@ src/app/
 
 ## 3. Components 구조 (src/components/)
 
+**공통 컴포넌트**만 `src/components/`에 위치하며, **피처별 컴포넌트**는 `src/features/[featureName]/components/`에 위치합니다.
+
 ```
 src/components/
 ├── ui/                           # 기본 UI 컴포넌트 (shadcn/ui)
+│   ├── accordion.tsx
+│   ├── avatar.tsx
+│   ├── badge.tsx
 │   ├── button.tsx
 │   ├── card.tsx
+│   ├── checkbox.tsx
 │   ├── dialog.tsx
+│   ├── dropdown-menu.tsx
+│   ├── form.tsx
 │   ├── input.tsx
+│   ├── label.tsx
 │   ├── progress.tsx
+│   ├── select.tsx
+│   ├── separator.tsx
+│   ├── sheet.tsx
 │   ├── tabs.tsx
+│   ├── textarea.tsx
 │   ├── toast.tsx
-│   ├── tooltip.tsx
-│   └── ...
+│   ├── toaster.tsx
+│   └── tooltip.tsx
 │
 ├── layouts/                      # 레이아웃 컴포넌트
 │   ├── header.tsx                # 공통 헤더
 │   ├── sidebar.tsx               # 사이드바
 │   ├── footer.tsx                # 푸터
-│   ├── dashboard-layout.tsx      # 대시보드 레이아웃
-│   └── auth-layout.tsx           # 인증 페이지 레이아웃
+│   └── dashboard-layout.tsx      # 대시보드 레이아웃
 │
-├── features/                     # 기능별 컴포넌트
-│   ├── auth/
-│   │   ├── login-form.tsx
-│   │   ├── register-form.tsx
-│   │   └── auth-guard.tsx
-│   │
-│   ├── modules/
-│   │   ├── module-card.tsx
-│   │   ├── module-list.tsx
-│   │   ├── module-detail.tsx
-│   │   └── step-indicator.tsx
-│   │
-│   ├── socratic-dialogue/
-│   │   ├── dialogue-container.tsx
-│   │   ├── chat-bubble.tsx
-│   │   ├── chat-input.tsx
-│   │   ├── typing-indicator.tsx
-│   │   └── dialogue-complete.tsx
-│   │
-│   ├── prompt-lab/
-│   │   ├── scenario-display.tsx
-│   │   ├── prompt-editor.tsx
-│   │   ├── response-display.tsx
-│   │   └── hint-panel.tsx
-│   │
-│   ├── comparison-lab/
-│   │   ├── comparison-panel.tsx
-│   │   ├── side-by-side.tsx
-│   │   ├── analysis-chart.tsx
-│   │   └── difference-highlight.tsx
-│   │
-│   ├── reflection-journal/
-│   │   ├── reflection-form.tsx
-│   │   ├── reflection-card.tsx
-│   │   ├── reflection-list.tsx
-│   │   └── insight-tags.tsx
-│   │
-│   ├── progress/
-│   │   ├── progress-overview.tsx
-│   │   ├── progress-bar.tsx
-│   │   ├── badge-display.tsx
-│   │   ├── badge-card.tsx
-│   │   └── activity-timeline.tsx
-│   │
-│   ├── resources/
-│   │   ├── resource-card.tsx
-│   │   └── resource-list.tsx
-│   │
-│   └── instructor/
-│       ├── student-table.tsx
-│       ├── progress-chart.tsx
-│       └── scenario-editor.tsx
-│
-└── common/                       # 공통 컴포넌트
+└── common/                       # 공통 유틸 컴포넌트
     ├── loading-spinner.tsx
     ├── error-boundary.tsx
     ├── empty-state.tsx
-    ├── language-switcher.tsx
     └── theme-toggle.tsx
 ```
 
-## 4. Domain 레이어 (src/domain/)
+## 4. Features 구조 (src/features/) - 피처 기반 모듈
+
+각 피처는 독립적인 모듈로 구성되며, 백엔드/프론트엔드 코드가 함께 위치합니다.
 
 ```
-src/domain/
-├── entities/                     # 도메인 엔티티
-│   ├── user.entity.ts
-│   ├── module.entity.ts
-│   ├── scenario.entity.ts
-│   ├── progress.entity.ts
-│   ├── dialogue.entity.ts
-│   ├── prompt.entity.ts
-│   ├── comparison.entity.ts
-│   ├── reflection.entity.ts
-│   └── badge.entity.ts
+src/features/
+├── auth/                         # 인증 피처
+│   ├── backend/
+│   │   ├── route.ts              # Hono 라우터 (/api/auth/*)
+│   │   ├── service.ts            # 비즈니스 로직
+│   │   ├── schema.ts             # Zod 스키마
+│   │   └── error.ts              # 에러 코드
+│   ├── components/
+│   │   ├── login-form.tsx
+│   │   └── signup-form.tsx
+│   ├── context/
+│   │   └── current-user-context.tsx
+│   ├── hooks/
+│   │   └── useCurrentUser.ts
+│   ├── lib/
+│   │   └── dto.ts                # DTO 재노출
+│   └── types.ts
 │
-├── interfaces/                   # 인터페이스 정의
-│   ├── repositories/
-│   │   ├── user.repository.ts
-│   │   ├── module.repository.ts
-│   │   ├── progress.repository.ts
-│   │   ├── dialogue.repository.ts
-│   │   └── reflection.repository.ts
-│   └── services/
-│       ├── ai.service.ts
-│       └── analytics.service.ts
+├── modules/                      # 학습 모듈 피처
+│   ├── backend/
+│   │   ├── route.ts              # /api/modules/*
+│   │   ├── service.ts
+│   │   └── schema.ts
+│   ├── components/
+│   │   ├── module-card.tsx
+│   │   ├── module-list.tsx
+│   │   ├── step-indicator.tsx
+│   │   └── module-detail.tsx
+│   ├── hooks/
+│   │   ├── useModules.ts
+│   │   └── useModule.ts
+│   └── types.ts
 │
-└── value-objects/                # 값 객체
-    ├── prompt-analysis.vo.ts
-    ├── learning-step.vo.ts
-    └── comparison-result.vo.ts
+├── dialogue/                     # 소크라테스 대화 피처
+│   ├── backend/
+│   │   ├── route.ts              # /api/dialogues/*
+│   │   ├── service.ts
+│   │   ├── schema.ts
+│   │   └── socratic-engine.ts    # AI 대화 엔진
+│   ├── components/
+│   │   ├── dialogue-container.tsx
+│   │   ├── chat-bubble.tsx
+│   │   ├── chat-input.tsx
+│   │   └── typing-indicator.tsx
+│   ├── hooks/
+│   │   └── useDialogue.ts
+│   └── types.ts
+│
+├── prompt-lab/                   # 프롬프트 작성 피처
+│   ├── backend/
+│   │   ├── route.ts              # /api/prompts/*
+│   │   ├── service.ts
+│   │   └── schema.ts
+│   ├── components/
+│   │   ├── scenario-display.tsx
+│   │   ├── prompt-editor.tsx
+│   │   └── response-display.tsx
+│   ├── hooks/
+│   │   └── usePromptSubmit.ts
+│   └── types.ts
+│
+├── comparison/                   # 비교 실험실 피처
+│   ├── backend/
+│   │   ├── route.ts              # /api/comparisons/*
+│   │   ├── service.ts
+│   │   ├── schema.ts
+│   │   └── prompt-analyzer.ts    # AI 분석기
+│   ├── components/
+│   │   ├── comparison-panel.tsx
+│   │   ├── side-by-side.tsx
+│   │   └── analysis-chart.tsx
+│   ├── hooks/
+│   │   └── useComparison.ts
+│   └── types.ts
+│
+├── reflection/                   # 성찰 저널 피처
+│   ├── backend/
+│   │   ├── route.ts              # /api/reflections/*
+│   │   ├── service.ts
+│   │   └── schema.ts
+│   ├── components/
+│   │   ├── reflection-form.tsx
+│   │   ├── reflection-card.tsx
+│   │   └── reflection-list.tsx
+│   ├── hooks/
+│   │   └── useReflections.ts
+│   └── types.ts
+│
+├── progress/                     # 진도 관리 피처
+│   ├── backend/
+│   │   ├── route.ts              # /api/progress/*
+│   │   ├── service.ts
+│   │   └── schema.ts
+│   ├── components/
+│   │   ├── progress-overview.tsx
+│   │   ├── badge-display.tsx
+│   │   └── activity-timeline.tsx
+│   ├── hooks/
+│   │   └── useProgress.ts
+│   └── types.ts
+│
+├── resources/                    # 학습 리소스 피처
+│   ├── backend/
+│   │   ├── route.ts              # /api/resources/*
+│   │   └── service.ts
+│   ├── components/
+│   │   ├── resource-card.tsx
+│   │   └── resource-list.tsx
+│   └── types.ts
+│
+└── instructor/                   # 교수자 기능 피처
+    ├── backend/
+    │   ├── route.ts              # /api/instructor/*
+    │   ├── service.ts
+    │   └── schema.ts
+    ├── components/
+    │   ├── student-table.tsx
+    │   ├── progress-chart.tsx
+    │   └── scenario-editor.tsx
+    ├── hooks/
+    │   └── useInstructorData.ts
+    └── types.ts
 ```
 
-## 5. Infrastructure 레이어 (src/infrastructure/)
+## 5. Backend 구조 (src/backend/)
+
+Hono 기반 서버 사이드 로직입니다.
 
 ```
-src/infrastructure/
-├── supabase/                     # Supabase 클라이언트
-│   ├── client.ts                 # 브라우저 클라이언트
-│   ├── server.ts                 # 서버 클라이언트
-│   └── admin.ts                  # Admin 클라이언트
+src/backend/
+├── config/
+│   └── index.ts                  # 환경 변수 파싱 (Zod)
 │
-├── repositories/                 # Repository 구현체
-│   ├── supabase-user.repository.ts
-│   ├── supabase-module.repository.ts
-│   ├── supabase-progress.repository.ts
-│   ├── supabase-dialogue.repository.ts
-│   ├── supabase-prompt.repository.ts
-│   ├── supabase-comparison.repository.ts
-│   └── supabase-reflection.repository.ts
+├── hono/
+│   ├── app.ts                    # Hono 앱 생성 (싱글턴)
+│   └── context.ts                # AppEnv 타입 정의
 │
-├── ai/                           # AI 서비스 구현
-│   ├── openai.client.ts          # OpenAI 클라이언트
-│   ├── socratic-engine.ts        # 소크라테스 대화 엔진
-│   ├── prompt-analyzer.ts        # 프롬프트 분석기
-│   └── response-generator.ts     # 응답 생성기
+├── http/
+│   └── response.ts               # success/failure/respond 헬퍼
 │
-└── external/                     # 외부 서비스
-    └── analytics.ts              # 분석 서비스
+├── middleware/
+│   ├── context.ts                # withAppContext 미들웨어
+│   ├── error.ts                  # errorBoundary 미들웨어
+│   └── supabase.ts               # withSupabase 미들웨어
+│
+└── supabase/
+    └── client.ts                 # Supabase 서버 클라이언트
 ```
 
-## 6. Services 레이어 (src/services/)
+## 6. Lib 구조 (src/lib/)
+
+공통 유틸리티 및 클라이언트입니다.
 
 ```
-src/services/
-├── auth.service.ts               # 인증 서비스
-├── module.service.ts             # 모듈 관리 서비스
-├── progress.service.ts           # 진도 관리 서비스
-├── dialogue.service.ts           # 대화 관리 서비스
-├── prompt.service.ts             # 프롬프트 관리 서비스
-├── comparison.service.ts         # 비교 분석 서비스
-├── reflection.service.ts         # 성찰 관리 서비스
-├── badge.service.ts              # 배지 관리 서비스
-└── instructor.service.ts         # 교수자 기능 서비스
+src/lib/
+├── remote/
+│   └── api-client.ts             # HTTP 클라이언트 (fetch 래퍼)
+│
+├── supabase/
+│   ├── browser-client.ts         # 브라우저용 Supabase
+│   ├── server-client.ts          # 서버용 Supabase
+│   └── types.ts                  # Supabase 타입
+│
+└── utils.ts                      # cn() 등 공통 유틸
 ```
 
 ## 7. Hooks (src/hooks/)
 
+공통 커스텀 훅입니다. 피처별 훅은 `src/features/[feature]/hooks/`에 위치합니다.
+
 ```
 src/hooks/
-├── useAuth.ts                    # 인증 상태 및 액션
-├── useUser.ts                    # 사용자 정보
-├── useModule.ts                  # 모듈 데이터
-├── useModules.ts                 # 모듈 목록
-├── useProgress.ts                # 진도 관리
-├── useDialogue.ts                # 대화 관리
-├── useStreamDialogue.ts          # 스트리밍 대화
-├── usePromptSubmit.ts            # 프롬프트 제출
-├── useComparison.ts              # 비교 분석
-├── useReflections.ts             # 성찰 저널
-├── useBadges.ts                  # 배지 관리
-├── useLanguage.ts                # 언어 설정
-└── useMediaQuery.ts              # 반응형 처리
+├── use-toast.ts                  # 토스트 알림
+├── use-media-query.ts            # 반응형 처리
+└── use-local-storage.ts          # 로컬 스토리지
 ```
 
-## 8. Stores (src/stores/)
+## 8. Constants (src/constants/)
+
+공통 상수입니다.
 
 ```
-src/stores/
-├── auth.store.ts                 # 인증 상태
-├── module.store.ts               # 모듈 상태
-├── progress.store.ts             # 진도 상태
-├── dialogue.store.ts             # 대화 상태
-├── ui.store.ts                   # UI 상태 (사이드바, 모달 등)
-└── index.ts                      # Store 통합 export
+src/constants/
+├── auth.ts                       # 인증 관련 상수
+├── env.ts                        # 환경 변수 상수
+├── routes.ts                     # 라우트 경로
+└── techniques.ts                 # 프롬프트 테크닉 정보
 ```
 
-## 9. Lib (src/lib/)
-
-```
-src/lib/
-├── utils/
-│   ├── cn.ts                     # className 유틸리티
-│   ├── date.ts                   # 날짜 포맷팅
-│   ├── string.ts                 # 문자열 처리
-│   └── error.ts                  # 에러 처리
-│
-├── validations/
-│   ├── auth.schema.ts            # 인증 검증
-│   ├── prompt.schema.ts          # 프롬프트 검증
-│   └── reflection.schema.ts      # 성찰 검증
-│
-├── constants/
-│   ├── routes.ts                 # 라우트 상수
-│   ├── api.ts                    # API 엔드포인트
-│   ├── techniques.ts             # 테크닉 정보
-│   └── messages.ts               # 시스템 메시지
-│
-└── i18n/
-    ├── config.ts                 # i18n 설정
-    └── dictionaries/
-        ├── ko.json
-        └── en.json
-```
-
-## 10. Tests 구조
-
-```
-tests/
-├── unit/
-│   ├── services/
-│   ├── hooks/
-│   └── components/
-├── integration/
-│   ├── api/
-│   └── features/
-├── e2e/
-│   ├── auth.spec.ts
-│   ├── module-learning.spec.ts
-│   └── reflection.spec.ts
-└── fixtures/
-    ├── users.ts
-    ├── modules.ts
-    └── scenarios.ts
-```
-
-## 11. Supabase 구조
+## 9. Supabase 마이그레이션
 
 ```
 supabase/
-├── migrations/
-│   ├── 00001_initial_schema.sql
-│   ├── 00002_create_profiles.sql
-│   ├── 00003_create_modules.sql
-│   ├── 00004_create_scenarios.sql
-│   ├── 00005_create_progress.sql
-│   ├── 00006_create_dialogues.sql
-│   ├── 00007_create_prompts.sql
-│   ├── 00008_create_comparisons.sql
-│   ├── 00009_create_reflections.sql
-│   ├── 00010_create_badges.sql
-│   ├── 00011_create_functions.sql
-│   └── 00012_create_rls_policies.sql
-├── seed.sql                      # 초기 모듈/시나리오 데이터
-└── config.toml                   # Supabase 설정
+└── migrations/
+    ├── 0001_create_example_table.sql   # 예시 (삭제 예정)
+    ├── 0002_create_profiles.sql
+    ├── 0003_create_user_roles.sql
+    ├── 0004_create_modules.sql
+    ├── 0005_create_scenarios.sql
+    ├── 0006_create_user_progress.sql
+    ├── 0007_create_dialogues.sql
+    ├── 0008_create_prompt_attempts.sql
+    ├── 0009_create_comparisons.sql
+    ├── 0010_create_reflections.sql
+    ├── 0011_create_technique_badges.sql
+    ├── 0012_create_peer_reviews.sql    # Phase 3
+    ├── 0013_create_resources.sql
+    └── 0014_create_functions.sql
 ```
 
-## 12. 환경 변수
+## 10. 환경 변수
 
 ```env
 # .env.example
@@ -397,14 +365,11 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 
-# OpenAI
-OPENAI_API_KEY=
-OPENAI_MODEL=gpt-4-turbo-preview
+# Anthropic Claude
+ANTHROPIC_API_KEY=
+ANTHROPIC_MODEL=claude-3-5-sonnet-20241022
 
 # App
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 NEXT_PUBLIC_APP_NAME=Prompt Lab
-
-# Analytics (선택)
-NEXT_PUBLIC_GA_ID=
 ```
