@@ -1,18 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { GraduationCap, BookOpen, Library, User, LogOut, Menu } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { GraduationCap, BookOpen, Library, LogOut, Menu, User2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuthStore } from '@/features/auth/stores/auth.store';
 import { ROUTES } from '@/constants/routes';
 
@@ -22,6 +14,7 @@ interface HeaderProps {
 
 export function Header({ onMenuClick }: HeaderProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, logout, isAuthenticated } = useAuthStore();
 
   const navItems = [
@@ -31,8 +24,10 @@ export function Header({ onMenuClick }: HeaderProps) {
 
   const handleLogout = async () => {
     await logout();
-    window.location.href = ROUTES.LOGIN;
+    router.push(ROUTES.LOGIN);
   };
+
+  const displayId = user?.studentId ?? user?.email?.split('@')[0] ?? '사용자';
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -76,53 +71,29 @@ export function Header({ onMenuClick }: HeaderProps) {
           )}
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           {isAuthenticated ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={user?.avatarUrl ?? undefined} alt={user?.fullName ?? ''} />
-                    <AvatarFallback className="bg-primary text-primary-foreground">
-                      {user?.fullName?.charAt(0) ?? user?.email?.charAt(0) ?? 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <div className="flex flex-col space-y-1 p-2">
-                  <p className="text-sm font-medium">{user?.fullName ?? '사용자'}</p>
-                  <p className="text-xs text-muted-foreground">{user?.email}</p>
-                </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href={ROUTES.MYPAGE.PROFILE} className="cursor-pointer">
-                    <User className="mr-2 h-4 w-4" />
-                    프로필 설정
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href={ROUTES.MYPAGE.PROGRESS} className="cursor-pointer">
-                    <BookOpen className="mr-2 h-4 w-4" />
-                    학습 진도
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  로그아웃
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <>
+              <div className="flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-2">
+                <User2 className="h-4 w-4 text-slate-600" />
+                <span className="text-sm font-medium text-slate-700">
+                  {displayId}
+                </span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleLogout}
+                className="flex items-center gap-2 text-slate-600 hover:text-destructive hover:border-destructive"
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="hidden sm:inline">로그아웃</span>
+              </Button>
+            </>
           ) : (
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" asChild>
-                <Link href={ROUTES.LOGIN}>로그인</Link>
-              </Button>
-              <Button asChild>
-                <Link href={ROUTES.SIGNUP}>회원가입</Link>
-              </Button>
-            </div>
+            <Button asChild>
+              <Link href={ROUTES.LOGIN}>로그인</Link>
+            </Button>
           )}
         </div>
       </div>

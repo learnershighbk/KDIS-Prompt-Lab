@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import type { AppEnv } from '@/backend/hono/context';
 import { success, failure } from '@/backend/http/response';
 import { AuthService } from './service';
-import { signupRequestSchema, loginRequestSchema } from './schema';
+import { signupRequestSchema, loginRequestSchema, simpleLoginRequestSchema } from './schema';
 
 const authRoutes = new Hono<AppEnv>();
 
@@ -72,6 +72,43 @@ authRoutes.post('/api/auth/login', async (c) => {
     );
   } catch (error) {
     logger.error('Login failed', { error });
+    return c.json(
+      failure('LOGIN_FAILED', error instanceof Error ? error.message : '로그인에 실패했습니다'),
+      401
+    );
+  }
+});
+
+authRoutes.post('/api/auth/simple-login', async (c) => {
+  const supabase = c.get('supabase');
+  const logger = c.get('logger');
+
+  try {
+    const body = await c.req.json();
+    const parseResult = simpleLoginRequestSchema.safeParse(body);
+
+    if (!parseResult.success) {
+      return c.json(
+        failure('VALIDATION_ERROR', parseResult.error.errors[0]?.message || '입력값이 올바르지 않습니다'),
+        400
+      );
+    }
+
+    const data = parseResult.data;
+    const service = new AuthService(supabase);
+    const result = await service.simpleLogin(data);
+
+    logger.info('Simple login successful', { studentId: data.studentId, isNewUser: result.isNewUser });
+
+    return c.json(
+      success({
+        ...result,
+        redirectTo: '/dashboard',
+      }),
+      result.isNewUser ? 201 : 200
+    );
+  } catch (error) {
+    logger.error('Simple login failed', { error });
     return c.json(
       failure('LOGIN_FAILED', error instanceof Error ? error.message : '로그인에 실패했습니다'),
       401

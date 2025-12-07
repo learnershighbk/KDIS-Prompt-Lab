@@ -24,6 +24,7 @@ interface AuthState {
   error: string | null;
 
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  simpleLogin: (studentId: string, pin: string) => Promise<{ success: boolean; error?: string; isNewUser?: boolean }>;
   signup: (email: string, password: string, fullName: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   refreshSession: () => Promise<void>;
@@ -84,6 +85,72 @@ export const useAuthStore = create<AuthState>()(
           });
 
           return { success: true };
+        } catch (err) {
+          const message = err instanceof Error ? err.message : '로그인 중 오류가 발생했습니다';
+          set({ isLoading: false, error: message });
+          return { success: false, error: message };
+        }
+      },
+
+      simpleLogin: async (studentId: string, pin: string) => {
+        const supabase = getSupabaseBrowserClient();
+        set({ isLoading: true, error: null });
+
+        try {
+          const response = await fetch('/api/auth/simple-login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ studentId, pin }),
+          });
+
+          const result = await response.json();
+
+          if (!response.ok || !result.ok) {
+            const errorMessage = result.error?.message ?? '로그인에 실패했습니다';
+            set({ isLoading: false, error: errorMessage });
+            return { success: false, error: errorMessage };
+          }
+
+          const SIMPLE_AUTH_EMAIL_DOMAIN = 'promptlab.app';
+          const PIN_PREFIX = 'PIN:';
+          const email = `${studentId}@${SIMPLE_AUTH_EMAIL_DOMAIN}`;
+          const password = `${PIN_PREFIX}${pin}`;
+
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+
+          if (signInError || !signInData.user) {
+            set({ isLoading: false, error: '로그인 세션 생성에 실패했습니다' });
+            return { success: false, error: '로그인 세션 생성에 실패했습니다' };
+          }
+
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*, user_roles(role)')
+            .eq('id', signInData.user.id)
+            .single();
+
+          const userProfile: UserProfile = {
+            id: signInData.user.id,
+            email: signInData.user.email ?? '',
+            fullName: profile?.full_name ?? null,
+            avatarUrl: profile?.avatar_url ?? null,
+            preferredLanguage: profile?.preferred_language ?? 'ko',
+            studentId: profile?.student_id ?? studentId,
+            department: profile?.department ?? null,
+            roles: profile?.user_roles?.map((r: { role: UserRole }) => r.role) ?? ['student'],
+          };
+
+          set({
+            user: userProfile,
+            isAuthenticated: true,
+            isLoading: false,
+            error: null,
+          });
+
+          return { success: true, isNewUser: result.data?.isNewUser ?? false };
         } catch (err) {
           const message = err instanceof Error ? err.message : '로그인 중 오류가 발생했습니다';
           set({ isLoading: false, error: message });

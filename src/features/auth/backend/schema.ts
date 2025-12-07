@@ -11,6 +11,18 @@ export const loginRequestSchema = z.object({
   password: z.string().min(1, '비밀번호를 입력해주세요'),
 });
 
+// 간편 로그인 스키마 (학번 + PIN)
+export const simpleLoginRequestSchema = z.object({
+  studentId: z
+    .string()
+    .regex(/^\d{9}$/, '학번(사번)은 9자리 숫자여야 합니다'),
+  pin: z
+    .string()
+    .regex(/^\d{4}$/, 'PIN은 4자리 숫자여야 합니다'),
+});
+
+export type SimpleLoginRequest = z.infer<typeof simpleLoginRequestSchema>;
+
 export const authResponseSchema = z.object({
   user: z.object({
     id: z.string(),

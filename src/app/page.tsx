@@ -1,308 +1,529 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Copy, CheckCircle2, Boxes, Database, LogOut, Server } from "lucide-react";
-import { getSupabaseBrowserClient } from "@/lib/supabase/browser-client";
+import { motion } from "framer-motion";
+import {
+  ArrowRight,
+  MessageCircle,
+  PenTool,
+  GitCompare,
+  BookOpen,
+  Sparkles,
+  GraduationCap,
+  ChevronRight,
+} from "lucide-react";
 import { useCurrentUser } from "@/features/auth/hooks/useCurrentUser";
 
-type SetupCommand = {
-  id: string;
-  label: string;
-  command: string;
-};
-
-const setupCommands: SetupCommand[] = [
-  { id: "install", label: "의존성 설치", command: "npm install" },
-  { id: "lint", label: "정적 점검", command: "npm run lint" },
-  { id: "dev", label: "로컬 개발 서버", command: "npm run dev" },
-];
-
-const envVariables = [
+const modules = [
   {
-    key: "SUPABASE_URL",
-    description: "Supabase 프로젝트 URL (https://...supabase.co)",
+    id: 1,
+    title: "좋은 질문이 좋은 답을 만든다",
+    technique: "Chain of Thought",
+    description: "프롬프트가 AI 응답 품질에 미치는 영향을 체험적으로 이해",
   },
   {
-    key: "SUPABASE_SERVICE_ROLE_KEY",
-    description:
-      "서버 전용 service-role 키. 절대 클라이언트로 노출하지 마세요.",
-  },
-];
-
-const directorySummary = [
-  {
-    title: "앱 라우터",
-    description: "Next.js App Router 엔트리포인트와 레이아웃 정의",
-    path: "src/app",
+    id: 2,
+    title: "문헌 리뷰 효과적으로 하기",
+    technique: "Few-shot Learning",
+    description: "학술 문헌 검색, 요약, 정리에 효과적인 프롬프트 작성",
   },
   {
-    title: "Hono 엔트리포인트",
-    description: "Next.js Route Handler에서 Hono 앱을 위임",
-    path: "src/app/api/[[...hono]]",
+    id: 3,
+    title: "정책 비교 분석 요청하기",
+    technique: "Self-Consistency",
+    description: "국가 간/정책 간 비교 분석을 위한 구조화된 프롬프트",
   },
   {
-    title: "백엔드 구성요소",
-    description: "Hono 앱, 미들웨어, Supabase 서비스",
-    path: "src/backend",
+    id: 4,
+    title: "데이터 해석 도움받기",
+    technique: "Persona Setting",
+    description: "통계 데이터 해석, 시각화 제안에 AI를 효과적으로 활용",
   },
   {
-    title: "기능 모듈",
-    description: "각 기능별 DTO, 라우터, React Query 훅",
-    path: "src/features/[feature]",
+    id: 5,
+    title: "정책 문서 작성 지원받기",
+    technique: "Constraints",
+    description: "브리핑, 정책 메모, 제안서 등 실무 문서 작성 지원",
   },
 ];
 
-const backendBuildingBlocks = [
+const steps = [
   {
-    icon: <Server className="w-4 h-4" />,
-    title: "Hono 앱 구성",
-    description:
-      "errorBoundary → withAppContext → withSupabase → registerExampleRoutes 순서로 미들웨어와 라우터를 조립합니다.",
+    number: "01",
+    title: "소크라테스 대화",
+    description: "AI 튜터의 유도 질문으로 원리를 발견",
+    icon: MessageCircle,
   },
   {
-    icon: <Database className="w-4 h-4" />,
-    title: "Supabase 서비스",
-    description:
-      "service-role 키로 생성한 서버 클라이언트를 사용하고, 쿼리 결과는 ts-pattern으로 분기 가능한 결과 객체로 반환합니다.",
+    number: "02",
+    title: "프롬프트 작성",
+    description: "정책 시나리오에 맞는 프롬프트 작성",
+    icon: PenTool,
   },
   {
-    icon: <Boxes className="w-4 h-4" />,
-    title: "React Query 연동",
-    description:
-      "모든 클라이언트 데이터 패칭은 useExampleQuery와 같은 React Query 훅을 통해 수행하며, DTO 스키마로 응답을 검증합니다.",
+    number: "03",
+    title: "비교 실험실",
+    description: "내 프롬프트와 개선안 결과 비교",
+    icon: GitCompare,
+  },
+  {
+    number: "04",
+    title: "성찰 저널",
+    description: "배운 점 정리 및 적용",
+    icon: BookOpen,
   },
 ];
 
-export default function Home() {
-  const [copiedCommand, setCopiedCommand] = useState<string | null>(null);
-  const { user, isAuthenticated, isLoading, refresh } = useCurrentUser();
-  const router = useRouter();
+export default function LandingPage() {
+  const { isAuthenticated, isLoading } = useCurrentUser();
 
-  const handleSignOut = useCallback(async () => {
-    const supabase = getSupabaseBrowserClient();
-    await supabase.auth.signOut();
-    await refresh();
-    router.replace("/");
-  }, [refresh, router]);
-
-  const authActions = useMemo(() => {
+  const ctaButton = useMemo(() => {
     if (isLoading) {
       return (
-        <span className="text-sm text-slate-300">세션 확인 중...</span>
+        <button
+          disabled
+          className="px-8 py-4 text-base font-medium rounded-full transition-all"
+          style={{ backgroundColor: "#D9D8DA", color: "#666" }}
+        >
+          로딩 중...
+        </button>
       );
     }
 
-    if (isAuthenticated && user) {
+    if (isAuthenticated) {
       return (
-        <div className="flex items-center gap-3 text-sm text-slate-200">
-          <span className="truncate">{user.email ?? "알 수 없는 사용자"}</span>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/dashboard"
-              className="rounded-md border border-slate-600 px-3 py-1 transition hover:border-slate-400 hover:bg-slate-800"
-            >
-              대시보드
-            </Link>
-            <button
-              type="button"
-              onClick={handleSignOut}
-              className="flex items-center gap-1 rounded-md bg-slate-100 px-3 py-1 text-slate-900 transition hover:bg-white"
-            >
-              <LogOut className="h-4 w-4" />
-              로그아웃
-            </button>
-          </div>
-        </div>
+        <Link href="/dashboard">
+          <button
+            className="group px-8 py-4 text-base font-medium text-white rounded-full transition-all hover:scale-105 flex items-center gap-2"
+            style={{ backgroundColor: "#292727" }}
+          >
+            대시보드로 이동
+            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+          </button>
+        </Link>
       );
     }
 
     return (
-      <div className="flex items-center gap-3 text-sm">
-        <Link
-          href="/login"
-          className="rounded-md border border-slate-600 px-3 py-1 text-slate-200 transition hover:border-slate-400 hover:bg-slate-800"
-        >
-          로그인
+      <div className="flex flex-col sm:flex-row items-center gap-4">
+        <Link href="/signup">
+          <button
+            className="group px-8 py-4 text-base font-medium text-white rounded-full transition-all hover:scale-105 flex items-center gap-2"
+            style={{ backgroundColor: "#292727" }}
+          >
+            무료로 시작하기
+            <Sparkles className="w-4 h-4" />
+          </button>
         </Link>
-        <Link
-          href="/signup"
-          className="rounded-md bg-slate-100 px-3 py-1 text-slate-900 transition hover:bg-white"
-        >
-          회원가입
+        <Link href="/login">
+          <button
+            className="px-8 py-4 text-base font-medium rounded-full transition-all hover:scale-105"
+            style={{
+              backgroundColor: "transparent",
+              color: "#292727",
+              border: "1px solid rgba(0,0,0,0.15)",
+            }}
+          >
+            로그인
+          </button>
         </Link>
       </div>
     );
-  }, [handleSignOut, isAuthenticated, isLoading, user]);
-
-  const handleCopy = (command: string) => {
-    navigator.clipboard.writeText(command);
-    setCopiedCommand(command);
-    window.setTimeout(() => setCopiedCommand(null), 2000);
-  };
+  }, [isAuthenticated, isLoading]);
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-16">
-        <div className="flex items-center justify-between rounded-xl border border-slate-700 bg-slate-900/80 px-6 py-4">
-          <div className="text-sm font-medium text-slate-300">
-            SuperNext — 구조적인 Next.js + Supabase 템플릿
-          </div>
-          {authActions}
-        </div>
-        <header className="space-y-4">
-          <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">
-            SuperNext 프로젝트 설정 & 구조 안내서
-          </h1>
-          <p className="max-w-3xl text-base text-slate-300 md:text-lg">
-            React Query / Hono.js / Supabase를 사용합니다.
-            <br /> 모든 컴포넌트는 Client Component로 작성합니다.
-          </p>
-        </header>
-
-        <section className="grid gap-8 md:grid-cols-2">
-          <SetupChecklist copiedCommand={copiedCommand} onCopy={handleCopy} />
-          <EnvironmentGuide />
-        </section>
-
-        <section className="grid gap-8 md:grid-cols-2">
-          <DirectoryOverview />
-          <BackendOverview />
-        </section>
-
-        <footer className="rounded-xl border border-slate-700 bg-slate-900/60 p-6">
-          <h2 className="text-lg font-semibold text-slate-100">
-            Supabase Migration
-          </h2>
-          <p className="mt-2 text-sm text-slate-300">
-            `supabase/migrations/20250227000100_create_example_table.sql` 파일을
-            Supabase 대시보드 SQL Editor에 업로드하여 `public.example` 테이블과
-            샘플 데이터를 생성하세요. 서비스 역할 키는 서버 환경 변수에만
-            저장하고, React Query 훅에서는 공개 API만 호출합니다.
-          </p>
-        </footer>
-      </div>
-    </main>
-  );
-}
-
-function SetupChecklist({
-  copiedCommand,
-  onCopy,
-}: {
-  copiedCommand: string | null;
-  onCopy: (command: string) => void;
-}) {
-  return (
-    <div className="space-y-4 rounded-xl border border-slate-700 bg-slate-900/60 p-6">
-      <h2 className="text-lg font-semibold text-slate-100">
-        SuperNext 설치 체크리스트
-      </h2>
-      <ul className="space-y-3">
-        {setupCommands.map((item) => (
-          <li key={item.id} className="flex items-start justify-between gap-3">
-            <div className="flex items-start gap-3">
-              <CheckCircle2 className="mt-1 h-5 w-5 text-emerald-400" />
-              <div>
-                <p className="font-medium text-slate-100">{item.label}</p>
-                <code className="text-sm text-slate-300">{item.command}</code>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => onCopy(item.command)}
-              className="flex items-center gap-1 rounded-md border border-slate-700 px-2 py-1 text-xs text-slate-200 transition hover:border-slate-500 hover:bg-slate-800"
+    <main className="min-h-screen w-full" style={{ backgroundColor: "#F7F5F2" }}>
+      {/* Navigation */}
+      <motion.nav
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-5 backdrop-blur-md"
+        style={{
+          backgroundColor: "rgba(247, 245, 242, 0.9)",
+          borderBottom: "1px solid rgba(0,0,0,0.06)",
+        }}
+      >
+        <div className="flex items-center gap-8">
+          <Link
+            href="/"
+            className="text-2xl tracking-tight font-serif italic"
+            style={{ color: "#292727" }}
+          >
+            Prompt Lab
+          </Link>
+          <div className="hidden md:flex items-center gap-6">
+            <Link
+              href="/modules"
+              className="text-sm font-medium transition-opacity hover:opacity-60"
+              style={{ color: "#292727" }}
             >
-              <Copy className="h-3.5 w-3.5" />
-              {copiedCommand === item.command ? "복사됨" : "복사"}
-            </button>
-          </li>
-        ))}
-      </ul>
-      <p className="text-xs text-slate-400">
-        개발 서버는 React Query Provider가 설정된 `src/app/providers.tsx`를
-        통과하여 실행됩니다.
-      </p>
-    </div>
-  );
-}
+              학습 모듈
+            </Link>
+            <Link
+              href="/resources"
+              className="text-sm font-medium transition-opacity hover:opacity-60"
+              style={{ color: "#292727" }}
+            >
+              리소스
+            </Link>
+          </div>
+        </div>
 
-function EnvironmentGuide() {
-  return (
-    <div className="space-y-4 rounded-xl border border-slate-700 bg-slate-900/60 p-6">
-      <h2 className="text-lg font-semibold text-slate-100">환경 변수</h2>
-      <p className="text-sm text-slate-300">
-        `.env.local` 파일에 아래 값을 추가하고, service-role 키는 서버 빌드
-        환경에서만 주입하세요.
-      </p>
-      <ul className="space-y-3">
-        {envVariables.map((item) => (
-          <li
-            key={item.key}
-            className="rounded-lg border border-slate-800 bg-slate-950/50 p-3"
-          >
-            <p className="font-medium text-slate-100">{item.key}</p>
-            <p className="text-xs text-slate-300">{item.description}</p>
-          </li>
-        ))}
-      </ul>
-      <p className="text-xs text-slate-400">
-        환경 스키마는 `src/backend/config/index.ts`에서 zod로 검증되며, 누락 시
-        명확한 오류를 발생시킵니다.
-      </p>
-    </div>
-  );
-}
+        <div className="flex items-center gap-4">
+          {isAuthenticated ? (
+            <Link href="/dashboard">
+              <button
+                className="px-5 py-2.5 text-sm font-medium text-white rounded-full transition-all hover:scale-105"
+                style={{ backgroundColor: "#292727" }}
+              >
+                대시보드
+              </button>
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="hidden sm:block text-sm font-medium transition-opacity hover:opacity-60"
+                style={{ color: "#292727" }}
+              >
+                로그인
+              </Link>
+              <Link href="/signup">
+                <button
+                  className="px-5 py-2.5 text-sm font-medium text-white rounded-full transition-all hover:scale-105"
+                  style={{ backgroundColor: "#292727" }}
+                >
+                  시작하기
+                </button>
+              </Link>
+            </>
+          )}
+        </div>
+      </motion.nav>
 
-function DirectoryOverview() {
-  return (
-    <div className="space-y-4 rounded-xl border border-slate-700 bg-slate-900/60 p-6">
-      <h2 className="text-lg font-semibold text-slate-100">
-        SuperNext 주요 디렉터리
-      </h2>
-      <ul className="space-y-3">
-        {directorySummary.map((item) => (
-          <li
-            key={item.path}
-            className="rounded-lg border border-slate-800 bg-slate-950/50 p-3"
-          >
-            <p className="text-sm font-semibold text-slate-100">{item.path}</p>
-            <p className="text-xs text-slate-300">{item.description}</p>
-            <p className="text-xs text-slate-400">{item.title}</p>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
+      {/* Hero Section */}
+      <section className="relative min-h-screen flex items-center pt-20">
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div
+            className="absolute top-1/4 right-0 w-[600px] h-[600px] rounded-full blur-3xl"
+            style={{ backgroundColor: "rgba(201, 162, 39, 0.08)" }}
+          />
+          <div
+            className="absolute bottom-0 left-1/4 w-[500px] h-[500px] rounded-full blur-3xl"
+            style={{ backgroundColor: "rgba(0, 51, 102, 0.05)" }}
+          />
+        </div>
 
-function BackendOverview() {
-  return (
-    <div className="space-y-4 rounded-xl border border-slate-700 bg-slate-900/60 p-6">
-      <h2 className="text-lg font-semibold text-slate-100">
-        SuperNext 백엔드 빌딩 블록
-      </h2>
-      <ul className="space-y-3">
-        {backendBuildingBlocks.map((item, index) => (
-          <li
-            key={item.title + index}
-            className="flex items-start gap-3 rounded-lg border border-slate-800 bg-slate-950/50 p-3"
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-8 lg:px-16 py-20">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left Content */}
+            <motion.div
+              initial={{ opacity: 0, x: -40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <div
+                className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium mb-8"
+                style={{
+                  backgroundColor: "rgba(0,0,0,0.05)",
+                  color: "#292727",
+                }}
+              >
+                <GraduationCap className="w-4 h-4" />
+                KDI School 전용
+              </div>
+
+              <h1
+                className="text-5xl lg:text-7xl leading-[1.1] mb-8 font-serif"
+                style={{ color: "#292727" }}
+              >
+                <span className="italic">가르치지 않고</span>
+                <br />
+                <span className="italic">깨닫게 한다</span>
+              </h1>
+
+              <p
+                className="text-lg lg:text-xl leading-relaxed mb-10 max-w-lg font-sans"
+                style={{ color: "#666" }}
+              >
+                소크라테스식 대화를 통해 프롬프트 엔지니어링의 핵심 원리를
+                스스로 체득하세요. 정책 학습과 리서치에 바로 적용할 수 있습니다.
+              </p>
+
+              {ctaButton}
+
+              <p
+                className="mt-6 text-sm font-sans"
+                style={{ color: "#999" }}
+              >
+                KDI School 학생이라면 누구나 무료
+              </p>
+            </motion.div>
+
+            {/* Right Content - Steps Preview */}
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="hidden lg:block"
+            >
+              <div className="relative">
+                <div
+                  className="absolute -inset-4 rounded-3xl"
+                  style={{ backgroundColor: "rgba(255,255,255,0.5)" }}
+                />
+                <div className="relative grid grid-cols-2 gap-4">
+                  {steps.map((step, index) => (
+                    <motion.div
+                      key={step.number}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: 0.5 + index * 0.1 }}
+                      className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow"
+                      style={{ border: "1px solid rgba(0,0,0,0.06)" }}
+                    >
+                      <div
+                        className="text-xs font-medium mb-3 font-sans"
+                        style={{ color: "#C9A227" }}
+                      >
+                        STEP {step.number}
+                      </div>
+                      <div
+                        className="w-10 h-10 rounded-xl flex items-center justify-center mb-4"
+                        style={{ backgroundColor: "#F7F5F2" }}
+                      >
+                        <step.icon className="w-5 h-5" style={{ color: "#292727" }} />
+                      </div>
+                      <h3
+                        className="font-semibold mb-2 font-sans"
+                        style={{ color: "#292727" }}
+                      >
+                        {step.title}
+                      </h3>
+                      <p
+                        className="text-sm font-sans"
+                        style={{ color: "#666" }}
+                      >
+                        {step.description}
+                      </p>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Modules Section */}
+      <section className="py-24" style={{ backgroundColor: "#FFFFFF" }}>
+        <div className="max-w-7xl mx-auto px-8 lg:px-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
           >
-            <div className="mt-0.5 text-indigo-300">{item.icon}</div>
-            <div>
-              <p className="font-medium text-slate-100">{item.title}</p>
-              <p className="text-xs text-slate-300">{item.description}</p>
-            </div>
-          </li>
-        ))}
-      </ul>
-      <p className="text-xs text-slate-400">
-        예시 라우터는 `src/features/example/backend/route.ts`, 서비스 로직은
-        `src/features/example/backend/service.ts`, 공통 스키마는
-        `src/features/example/backend/schema.ts`에서 관리하며 Supabase
-        `public.example` 테이블과 통신합니다.
-      </p>
-    </div>
+            <h2
+              className="text-4xl lg:text-5xl font-serif italic mb-4"
+              style={{ color: "#292727" }}
+            >
+              5개의 실전 모듈
+            </h2>
+            <p
+              className="text-lg font-sans"
+              style={{ color: "#666" }}
+            >
+              정책대학원생을 위해 설계된 커리큘럼
+            </p>
+          </motion.div>
+
+          <div className="space-y-4">
+            {modules.map((module, index) => (
+              <motion.div
+                key={module.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
+                <div
+                  className="group flex items-center justify-between p-6 lg:p-8 rounded-2xl transition-all cursor-pointer hover:shadow-lg"
+                  style={{
+                    backgroundColor: "#F7F5F2",
+                    border: "1px solid transparent",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "#FFFFFF";
+                    e.currentTarget.style.border = "1px solid rgba(0,0,0,0.08)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "#F7F5F2";
+                    e.currentTarget.style.border = "1px solid transparent";
+                  }}
+                >
+                  <div className="flex items-center gap-6 lg:gap-8">
+                    <div
+                      className="text-3xl lg:text-4xl font-serif italic"
+                      style={{ color: "#C9A227" }}
+                    >
+                      {String(module.id).padStart(2, "0")}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3
+                          className="text-lg lg:text-xl font-semibold font-sans"
+                          style={{ color: "#292727" }}
+                        >
+                          {module.title}
+                        </h3>
+                        <span
+                          className="hidden sm:inline-flex px-3 py-1 rounded-full text-xs font-medium font-sans"
+                          style={{
+                            backgroundColor: "rgba(201, 162, 39, 0.15)",
+                            color: "#292727",
+                          }}
+                        >
+                          {module.technique}
+                        </span>
+                      </div>
+                      <p
+                        className="text-sm lg:text-base font-sans"
+                        style={{ color: "#666" }}
+                      >
+                        {module.description}
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRight
+                    className="w-6 h-6 transition-transform group-hover:translate-x-2"
+                    style={{ color: "#292727" }}
+                  />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-24" style={{ backgroundColor: "#292727" }}>
+        <div className="max-w-4xl mx-auto px-8 lg:px-16 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2
+              className="text-4xl lg:text-5xl font-serif italic mb-6"
+              style={{ color: "#F7F5F2" }}
+            >
+              지금 시작하세요
+            </h2>
+            <p
+              className="text-lg mb-10 max-w-2xl mx-auto font-sans"
+              style={{ color: "rgba(247, 245, 242, 0.7)" }}
+            >
+              프롬프트 엔지니어링 역량을 키우고 정책 연구의 효율을 높여보세요.
+              소크라테스 선생님이 기다리고 있습니다.
+            </p>
+
+            {isAuthenticated ? (
+              <Link href="/dashboard">
+                <button
+                  className="group px-10 py-5 text-base font-medium rounded-full transition-all hover:scale-105 flex items-center gap-2 mx-auto font-sans"
+                  style={{ backgroundColor: "#F7F5F2", color: "#292727" }}
+                >
+                  대시보드로 이동
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </button>
+              </Link>
+            ) : (
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Link href="/signup">
+                  <button
+                    className="group px-10 py-5 text-base font-medium rounded-full transition-all hover:scale-105 flex items-center gap-2 font-sans"
+                    style={{ backgroundColor: "#F7F5F2", color: "#292727" }}
+                  >
+                    무료로 시작하기
+                    <Sparkles className="w-4 h-4" />
+                  </button>
+                </Link>
+                <Link href="/login">
+                  <button
+                    className="px-10 py-5 text-base font-medium rounded-full transition-all hover:scale-105 font-sans"
+                    style={{
+                      backgroundColor: "transparent",
+                      color: "#F7F5F2",
+                      border: "1px solid rgba(247, 245, 242, 0.3)",
+                    }}
+                  >
+                    이미 계정이 있어요
+                  </button>
+                </Link>
+              </div>
+            )}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer
+        className="py-8"
+        style={{
+          backgroundColor: "#F7F5F2",
+          borderTop: "1px solid rgba(0,0,0,0.06)",
+        }}
+      >
+        <div className="max-w-7xl mx-auto px-8 lg:px-16">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <Link
+              href="/"
+              className="text-xl font-serif italic"
+              style={{ color: "#292727" }}
+            >
+              Prompt Lab
+            </Link>
+            <p className="text-sm font-sans" style={{ color: "#999" }}>
+              © 2025 KDI School Educational Technology Team
+            </p>
+          </div>
+        </div>
+      </footer>
+
+      {/* Bottom floating CTA */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 1 }}
+        className="fixed bottom-6 right-6 z-40 hidden lg:block"
+      >
+        <Link
+          href={isAuthenticated ? "/dashboard" : "/signup"}
+          className="flex items-center gap-4 bg-white rounded-2xl px-5 py-4 shadow-lg hover:shadow-xl transition-all hover:scale-105"
+          style={{ border: "1px solid rgba(0,0,0,0.06)" }}
+        >
+          <div
+            className="w-12 h-12 rounded-xl flex items-center justify-center"
+            style={{ backgroundColor: "#292727" }}
+          >
+            <span className="text-white text-lg font-serif italic">P</span>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-medium font-sans" style={{ color: "#292727" }}>
+              학습 시작하기
+            </span>
+            <span className="text-xs font-sans" style={{ color: "#999" }}>
+              지금 바로 체험해보세요
+            </span>
+          </div>
+          <ArrowRight className="w-5 h-5 ml-2" style={{ color: "#292727" }} />
+        </Link>
+      </motion.div>
+    </main>
   );
 }
