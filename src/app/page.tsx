@@ -15,10 +15,20 @@ import {
 } from "lucide-react";
 import { useCurrentUser } from "@/features/auth/hooks/useCurrentUser";
 import { useTranslation } from "@/features/i18n/hooks/useTranslation";
+import { useLocaleStore } from "@/features/i18n/stores/locale.store";
+import { Languages } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 export default function LandingPage() {
   const { isAuthenticated, isLoading } = useCurrentUser();
   const { t } = useTranslation();
+  const { locale, setLocale } = useLocaleStore();
 
   const modules = useMemo(() => [
     {
@@ -174,6 +184,36 @@ export default function LandingPage() {
         </div>
 
         <div className="flex items-center gap-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-full transition-all hover:opacity-80"
+                style={{
+                  backgroundColor: "rgba(0,0,0,0.05)",
+                  color: "#292727",
+                }}
+              >
+                <Languages className="h-4 w-4" />
+                <span className="hidden sm:inline">
+                  {locale === 'ko' ? '한국어' : 'English'}
+                </span>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem 
+                onClick={() => setLocale('ko')} 
+                className={locale === 'ko' ? 'bg-accent font-medium' : ''}
+              >
+                한국어
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setLocale('en')} 
+                className={locale === 'en' ? 'bg-accent font-medium' : ''}
+              >
+                English
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           {isAuthenticated ? (
             <Link href="/dashboard">
               <button

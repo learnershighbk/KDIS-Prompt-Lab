@@ -52,7 +52,7 @@ export function Header({ onMenuClick }: HeaderProps) {
             <Menu className="h-5 w-5" />
           </Button>
 
-          <Link href={isAuthenticated ? ROUTES.DASHBOARD : ROUTES.HOME} className="flex items-center gap-2">
+          <Link href={ROUTES.HOME} className="flex items-center gap-2">
             <GraduationCap className="h-8 w-8 text-primary" />
             <span className="text-xl font-bold text-primary hidden sm:inline">Prompt Lab</span>
           </Link>
@@ -84,16 +84,28 @@ export function Header({ onMenuClick }: HeaderProps) {
         <div className="flex items-center gap-3">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-9 w-9">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="h-9 gap-2 border-muted-foreground/20 hover:bg-muted"
+              >
                 <Languages className="h-4 w-4" />
-                <span className="sr-only">Change language</span>
+                <span className="hidden sm:inline text-sm font-medium">
+                  {locale === 'ko' ? '한국어' : 'English'}
+                </span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setLocale('ko')} className={locale === 'ko' ? 'bg-accent' : ''}>
+              <DropdownMenuItem 
+                onClick={() => setLocale('ko')} 
+                className={locale === 'ko' ? 'bg-accent font-medium' : ''}
+              >
                 한국어
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setLocale('en')} className={locale === 'en' ? 'bg-accent' : ''}>
+              <DropdownMenuItem 
+                onClick={() => setLocale('en')} 
+                className={locale === 'en' ? 'bg-accent font-medium' : ''}
+              >
                 English
               </DropdownMenuItem>
             </DropdownMenuContent>
