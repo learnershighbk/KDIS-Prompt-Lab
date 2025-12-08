@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { streamText } from 'hono/streaming';
-import type { AppEnv } from '@/backend/hono/context';
-import { success, failure } from '@/backend/http/response';
+import type { AppEnv, AppContext } from '@/backend/hono/context';
+import { success, failure, respond } from '@/backend/http/response';
 import { AIService } from './service';
 import {
   socraticRequestSchema,
@@ -11,7 +11,7 @@ import {
 
 const aiRoutes = new Hono<AppEnv>();
 
-const getAIService = (c: { get: (key: 'supabase' | 'config') => ReturnType<typeof c.get> }) => {
+const getAIService = (c: AppContext) => {
   const supabase = c.get('supabase');
   const config = c.get('config');
   return new AIService(supabase, config.anthropic.apiKey);
@@ -25,10 +25,7 @@ aiRoutes.post('/api/ai/socratic', async (c) => {
     const parseResult = socraticRequestSchema.safeParse(body);
 
     if (!parseResult.success) {
-      return c.json(
-        failure('VALIDATION_ERROR', parseResult.error.errors[0]?.message || '입력값이 올바르지 않습니다'),
-        400
-      );
+      return respond(c, failure(400, 'VALIDATION_ERROR', parseResult.error.errors[0]?.message || '입력값이 올바르지 않습니다'));
     }
 
     const data = parseResult.data;
@@ -37,18 +34,13 @@ aiRoutes.post('/api/ai/socratic', async (c) => {
 
     logger.info('Socratic response generated', { moduleId: data.moduleId, canProceed });
 
-    return c.json(
-      success({
-        message,
-        canProceed,
-      })
-    );
+    return respond(c, success({
+      message,
+      canProceed,
+    }));
   } catch (error) {
     logger.error('Socratic response failed', { error });
-    return c.json(
-      failure('AI_ERROR', error instanceof Error ? error.message : 'AI 응답 생성에 실패했습니다'),
-      500
-    );
+    return respond(c, failure(500, 'AI_ERROR', error instanceof Error ? error.message : 'AI 응답 생성에 실패했습니다'));
   }
 });
 
@@ -60,10 +52,7 @@ aiRoutes.post('/api/ai/socratic/stream', async (c) => {
     const parseResult = socraticRequestSchema.safeParse(body);
 
     if (!parseResult.success) {
-      return c.json(
-        failure('VALIDATION_ERROR', parseResult.error.errors[0]?.message || '입력값이 올바르지 않습니다'),
-        400
-      );
+      return respond(c, failure(400, 'VALIDATION_ERROR', parseResult.error.errors[0]?.message || '입력값이 올바르지 않습니다'));
     }
 
     const data = parseResult.data;
@@ -78,10 +67,7 @@ aiRoutes.post('/api/ai/socratic/stream', async (c) => {
     });
   } catch (error) {
     logger.error('Socratic stream failed', { error });
-    return c.json(
-      failure('AI_STREAM_ERROR', error instanceof Error ? error.message : 'AI 스트리밍에 실패했습니다'),
-      500
-    );
+    return respond(c, failure(500, 'AI_STREAM_ERROR', error instanceof Error ? error.message : 'AI 스트리밍에 실패했습니다'));
   }
 });
 
@@ -90,7 +76,7 @@ aiRoutes.get('/api/ai/socratic/initial/:moduleId', async (c) => {
   const service = getAIService(c);
   const message = service.getInitialMessage(moduleId);
 
-  return c.json(success({ message }));
+  return respond(c, success({ message }));
 });
 
 aiRoutes.post('/api/ai/analyze-prompt', async (c) => {
@@ -101,10 +87,7 @@ aiRoutes.post('/api/ai/analyze-prompt', async (c) => {
     const parseResult = promptAnalysisRequestSchema.safeParse(body);
 
     if (!parseResult.success) {
-      return c.json(
-        failure('VALIDATION_ERROR', parseResult.error.errors[0]?.message || '입력값이 올바르지 않습니다'),
-        400
-      );
+      return respond(c, failure(400, 'VALIDATION_ERROR', parseResult.error.errors[0]?.message || '입력값이 올바르지 않습니다'));
     }
 
     const data = parseResult.data;
@@ -113,13 +96,10 @@ aiRoutes.post('/api/ai/analyze-prompt', async (c) => {
 
     logger.info('Prompt analyzed', { moduleId: data.moduleId });
 
-    return c.json(success(result));
+    return respond(c, success(result));
   } catch (error) {
     logger.error('Prompt analysis failed', { error });
-    return c.json(
-      failure('ANALYSIS_ERROR', error instanceof Error ? error.message : '프롬프트 분석에 실패했습니다'),
-      500
-    );
+    return respond(c, failure(500, 'ANALYSIS_ERROR', error instanceof Error ? error.message : '프롬프트 분석에 실패했습니다'));
   }
 });
 
@@ -131,10 +111,7 @@ aiRoutes.post('/api/ai/compare', async (c) => {
     const parseResult = comparisonRequestSchema.safeParse(body);
 
     if (!parseResult.success) {
-      return c.json(
-        failure('VALIDATION_ERROR', parseResult.error.errors[0]?.message || '입력값이 올바르지 않습니다'),
-        400
-      );
+      return respond(c, failure(400, 'VALIDATION_ERROR', parseResult.error.errors[0]?.message || '입력값이 올바르지 않습니다'));
     }
 
     const data = parseResult.data;
@@ -143,13 +120,10 @@ aiRoutes.post('/api/ai/compare', async (c) => {
 
     logger.info('Prompts compared', { moduleId: data.moduleId });
 
-    return c.json(success(result));
+    return respond(c, success(result));
   } catch (error) {
     logger.error('Prompt comparison failed', { error });
-    return c.json(
-      failure('COMPARISON_ERROR', error instanceof Error ? error.message : '프롬프트 비교에 실패했습니다'),
-      500
-    );
+    return respond(c, failure(500, 'COMPARISON_ERROR', error instanceof Error ? error.message : '프롬프트 비교에 실패했습니다'));
   }
 });
 

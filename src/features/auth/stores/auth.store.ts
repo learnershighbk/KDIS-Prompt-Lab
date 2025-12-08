@@ -32,6 +32,33 @@ interface AuthState {
   clearError: () => void;
 }
 
+interface ProfileData {
+  full_name?: string | null;
+  avatar_url?: string | null;
+  preferred_language?: 'ko' | 'en' | null;
+  student_id?: string | null;
+  department?: string | null;
+  user_roles?: { role: UserRole }[] | null;
+}
+
+function buildUserProfile(
+  userId: string,
+  email: string,
+  profileData: ProfileData | null,
+  fallbackStudentId?: string
+): UserProfile {
+  return {
+    id: userId,
+    email: email,
+    fullName: profileData?.full_name ?? null,
+    avatarUrl: profileData?.avatar_url ?? null,
+    preferredLanguage: profileData?.preferred_language ?? 'ko',
+    studentId: profileData?.student_id ?? fallbackStudentId ?? null,
+    department: profileData?.department ?? null,
+    roles: profileData?.user_roles?.map((r) => r.role) ?? ['student'],
+  };
+}
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
@@ -60,22 +87,17 @@ export const useAuthStore = create<AuthState>()(
             return { success: false, error: '로그인에 실패했습니다' };
           }
 
-          const { data: profile } = await supabase
+          const { data: profileData } = await supabase
             .from('profiles')
             .select('*, user_roles(role)')
             .eq('id', data.user.id)
             .single();
 
-          const userProfile: UserProfile = {
-            id: data.user.id,
-            email: data.user.email ?? '',
-            fullName: profile?.full_name ?? null,
-            avatarUrl: profile?.avatar_url ?? null,
-            preferredLanguage: profile?.preferred_language ?? 'ko',
-            studentId: profile?.student_id ?? null,
-            department: profile?.department ?? null,
-            roles: profile?.user_roles?.map((r: { role: UserRole }) => r.role) ?? ['student'],
-          };
+          const userProfile = buildUserProfile(
+            data.user.id,
+            data.user.email ?? '',
+            profileData as ProfileData | null
+          );
 
           set({
             user: userProfile,
@@ -126,22 +148,18 @@ export const useAuthStore = create<AuthState>()(
             return { success: false, error: '로그인 세션 생성에 실패했습니다' };
           }
 
-          const { data: profile } = await supabase
+          const { data: profileData } = await supabase
             .from('profiles')
             .select('*, user_roles(role)')
             .eq('id', signInData.user.id)
             .single();
 
-          const userProfile: UserProfile = {
-            id: signInData.user.id,
-            email: signInData.user.email ?? '',
-            fullName: profile?.full_name ?? null,
-            avatarUrl: profile?.avatar_url ?? null,
-            preferredLanguage: profile?.preferred_language ?? 'ko',
-            studentId: profile?.student_id ?? studentId,
-            department: profile?.department ?? null,
-            roles: profile?.user_roles?.map((r: { role: UserRole }) => r.role) ?? ['student'],
-          };
+          const userProfile = buildUserProfile(
+            signInData.user.id,
+            signInData.user.email ?? '',
+            profileData as ProfileData | null,
+            studentId
+          );
 
           set({
             user: userProfile,
@@ -199,22 +217,17 @@ export const useAuthStore = create<AuthState>()(
           const { data: { user } } = await supabase.auth.getUser();
 
           if (user) {
-            const { data: profile } = await supabase
+            const { data: profileData } = await supabase
               .from('profiles')
               .select('*, user_roles(role)')
               .eq('id', user.id)
               .single();
 
-            const userProfile: UserProfile = {
-              id: user.id,
-              email: user.email ?? '',
-              fullName: profile?.full_name ?? null,
-              avatarUrl: profile?.avatar_url ?? null,
-              preferredLanguage: profile?.preferred_language ?? 'ko',
-              studentId: profile?.student_id ?? null,
-              department: profile?.department ?? null,
-              roles: profile?.user_roles?.map((r: { role: UserRole }) => r.role) ?? ['student'],
-            };
+            const userProfile = buildUserProfile(
+              user.id,
+              user.email ?? '',
+              profileData as ProfileData | null
+            );
 
             set({
               user: userProfile,

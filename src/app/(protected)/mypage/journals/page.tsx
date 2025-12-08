@@ -54,7 +54,7 @@ const mockJournals: JournalEntry[] = [
 
 export default function JournalsPage({ params }: JournalsPageProps) {
   void params;
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [journals, setJournals] = useState<JournalEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -66,8 +66,8 @@ export default function JournalsPage({ params }: JournalsPageProps) {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    const locale = t.locale === 'ko' ? 'ko-KR' : 'en-US';
-    return date.toLocaleDateString(locale, {
+    const dateLocale = locale === 'ko' ? 'ko-KR' : 'en-US';
+    return date.toLocaleDateString(dateLocale, {
       year: 'numeric',
       month: 'long',
       day: 'numeric',

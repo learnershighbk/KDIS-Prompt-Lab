@@ -96,11 +96,14 @@ export async function getProgressOverview(
       percentage: totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0,
     },
     modules: moduleProgress,
-    badges: badges?.map((b) => ({
-      technique: b.technique_name,
-      moduleTitle: (b.modules as { title: string } | null)?.title ?? '',
-      earnedAt: b.earned_at,
-    })) ?? [],
+    badges: badges?.map((b) => {
+      const mod = b.modules as unknown as { title: string } | null;
+      return {
+        technique: b.technique_name,
+        moduleTitle: mod?.title ?? '',
+        earnedAt: b.earned_at,
+      };
+    }) ?? [],
     recentActivity: recentActivity.slice(0, 10),
   };
 }

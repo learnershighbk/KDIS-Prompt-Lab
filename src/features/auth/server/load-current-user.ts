@@ -11,6 +11,13 @@ const mapUser = (user: User) => ({
   userMetadata: user.user_metadata ?? {},
 });
 
+type ErrorWithDigest = Error & { digest?: string };
+
+const isDynamicServerUsageError = (error: unknown): boolean => {
+  if (!(error instanceof Error)) return false;
+  return (error as ErrorWithDigest).digest === "DYNAMIC_SERVER_USAGE";
+};
+
 export const loadCurrentUser = async (): Promise<CurrentUserSnapshot> => {
   try {
     const supabase = await createSupabaseServerClient();
@@ -25,8 +32,10 @@ export const loadCurrentUser = async (): Promise<CurrentUserSnapshot> => {
     }
 
     return { status: "unauthenticated", user: null };
-  } catch (error) {
-    console.error("loadCurrentUser 에러:", error);
+  } catch (error: unknown) {
+    if (!isDynamicServerUsageError(error)) {
+      console.error("loadCurrentUser 에러:", error);
+    }
     return { status: "unauthenticated", user: null };
   }
 };

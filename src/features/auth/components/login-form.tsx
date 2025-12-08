@@ -23,8 +23,6 @@ function createLoginSchema(t: (key: string) => string) {
   });
 }
 
-type LoginInput = z.infer<typeof loginSchema>;
-
 export function LoginForm() {
   const router = useRouter();
   const login = useAuthStore((s) => s.login);

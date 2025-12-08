@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import type { AppEnv } from '@/backend/hono/context';
-import { success, failure } from '@/backend/http/response';
+import { success, failure, respond } from '@/backend/http/response';
 import { AuthService } from './service';
 import { signupRequestSchema, loginRequestSchema, simpleLoginRequestSchema } from './schema';
 
@@ -15,10 +15,7 @@ authRoutes.post('/api/auth/signup', async (c) => {
     const parseResult = signupRequestSchema.safeParse(body);
 
     if (!parseResult.success) {
-      return c.json(
-        failure('VALIDATION_ERROR', parseResult.error.errors[0]?.message || '입력값이 올바르지 않습니다'),
-        400
-      );
+      return respond(c, failure(400, 'VALIDATION_ERROR', parseResult.error.errors[0]?.message || '입력값이 올바르지 않습니다'));
     }
 
     const data = parseResult.data;
@@ -27,19 +24,13 @@ authRoutes.post('/api/auth/signup', async (c) => {
 
     logger.info('User signed up successfully', { email: data.email });
 
-    return c.json(
-      success({
-        ...result,
-        redirectTo: '/dashboard',
-      }),
-      201
-    );
+    return respond(c, success({
+      ...result,
+      redirectTo: '/dashboard',
+    }, 201));
   } catch (error) {
     logger.error('Signup failed', { error });
-    return c.json(
-      failure('SIGNUP_FAILED', error instanceof Error ? error.message : '회원가입에 실패했습니다'),
-      400
-    );
+    return respond(c, failure(400, 'SIGNUP_FAILED', error instanceof Error ? error.message : '회원가입에 실패했습니다'));
   }
 });
 
@@ -52,10 +43,7 @@ authRoutes.post('/api/auth/login', async (c) => {
     const parseResult = loginRequestSchema.safeParse(body);
 
     if (!parseResult.success) {
-      return c.json(
-        failure('VALIDATION_ERROR', parseResult.error.errors[0]?.message || '입력값이 올바르지 않습니다'),
-        400
-      );
+      return respond(c, failure(400, 'VALIDATION_ERROR', parseResult.error.errors[0]?.message || '입력값이 올바르지 않습니다'));
     }
 
     const data = parseResult.data;
@@ -64,18 +52,13 @@ authRoutes.post('/api/auth/login', async (c) => {
 
     logger.info('User logged in successfully', { email: data.email });
 
-    return c.json(
-      success({
-        ...result,
-        redirectTo: '/dashboard',
-      })
-    );
+    return respond(c, success({
+      ...result,
+      redirectTo: '/dashboard',
+    }));
   } catch (error) {
     logger.error('Login failed', { error });
-    return c.json(
-      failure('LOGIN_FAILED', error instanceof Error ? error.message : '로그인에 실패했습니다'),
-      401
-    );
+    return respond(c, failure(401, 'LOGIN_FAILED', error instanceof Error ? error.message : '로그인에 실패했습니다'));
   }
 });
 
@@ -88,10 +71,7 @@ authRoutes.post('/api/auth/simple-login', async (c) => {
     const parseResult = simpleLoginRequestSchema.safeParse(body);
 
     if (!parseResult.success) {
-      return c.json(
-        failure('VALIDATION_ERROR', parseResult.error.errors[0]?.message || '입력값이 올바르지 않습니다'),
-        400
-      );
+      return respond(c, failure(400, 'VALIDATION_ERROR', parseResult.error.errors[0]?.message || '입력값이 올바르지 않습니다'));
     }
 
     const data = parseResult.data;
@@ -100,19 +80,13 @@ authRoutes.post('/api/auth/simple-login', async (c) => {
 
     logger.info('Simple login successful', { studentId: data.studentId, isNewUser: result.isNewUser });
 
-    return c.json(
-      success({
-        ...result,
-        redirectTo: '/dashboard',
-      }),
-      result.isNewUser ? 201 : 200
-    );
+    return respond(c, success({
+      ...result,
+      redirectTo: '/dashboard',
+    }, result.isNewUser ? 201 : 200));
   } catch (error) {
     logger.error('Simple login failed', { error });
-    return c.json(
-      failure('LOGIN_FAILED', error instanceof Error ? error.message : '로그인에 실패했습니다'),
-      401
-    );
+    return respond(c, failure(401, 'LOGIN_FAILED', error instanceof Error ? error.message : '로그인에 실패했습니다'));
   }
 });
 
@@ -126,17 +100,12 @@ authRoutes.post('/api/auth/logout', async (c) => {
 
     logger.info('User logged out successfully');
 
-    return c.json(
-      success({
-        redirectTo: '/login',
-      })
-    );
+    return respond(c, success({
+      redirectTo: '/login',
+    }));
   } catch (error) {
     logger.error('Logout failed', { error });
-    return c.json(
-      failure('LOGOUT_FAILED', error instanceof Error ? error.message : '로그아웃에 실패했습니다'),
-      500
-    );
+    return respond(c, failure(500, 'LOGOUT_FAILED', error instanceof Error ? error.message : '로그아웃에 실패했습니다'));
   }
 });
 
@@ -148,13 +117,10 @@ authRoutes.get('/api/auth/session', async (c) => {
     const service = new AuthService(supabase);
     const result = await service.getSession();
 
-    return c.json(success(result));
+    return respond(c, success(result));
   } catch (error) {
     logger.error('Get session failed', { error });
-    return c.json(
-      failure('SESSION_ERROR', error instanceof Error ? error.message : '세션 조회에 실패했습니다'),
-      500
-    );
+    return respond(c, failure(500, 'SESSION_ERROR', error instanceof Error ? error.message : '세션 조회에 실패했습니다'));
   }
 });
 
@@ -168,13 +134,10 @@ authRoutes.post('/api/auth/refresh', async (c) => {
 
     logger.info('Session refreshed successfully');
 
-    return c.json(success(result));
+    return respond(c, success(result));
   } catch (error) {
     logger.error('Refresh session failed', { error });
-    return c.json(
-      failure('REFRESH_FAILED', error instanceof Error ? error.message : '세션 갱신에 실패했습니다'),
-      500
-    );
+    return respond(c, failure(500, 'REFRESH_FAILED', error instanceof Error ? error.message : '세션 갱신에 실패했습니다'));
   }
 });
 

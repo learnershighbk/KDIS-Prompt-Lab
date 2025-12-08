@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
 import { useCurrentUser } from "@/features/auth/hooks/useCurrentUser";
@@ -10,8 +10,7 @@ type LoginPageProps = {
   params: Promise<Record<string, never>>;
 };
 
-export default function LoginPage({ params }: LoginPageProps) {
-  void params;
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { simpleLogin, isAuthenticated } = useAuthStore();
@@ -173,5 +172,23 @@ export default function LoginPage({ params }: LoginPageProps) {
         </p>
       </form>
     </div>
+  );
+}
+
+function LoginFormFallback() {
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+    </div>
+  );
+}
+
+export default function LoginPage({ params }: LoginPageProps) {
+  void params;
+  
+  return (
+    <Suspense fallback={<LoginFormFallback />}>
+      <LoginForm />
+    </Suspense>
   );
 }

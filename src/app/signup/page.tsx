@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getSupabaseBrowserClient } from "@/lib/supabase/browser-client";
 import { useCurrentUser } from "@/features/auth/hooks/useCurrentUser";
+import { Loader2 } from "lucide-react";
 
 const defaultFormState = {
   email: "",
@@ -17,8 +18,7 @@ type SignupPageProps = {
   params: Promise<Record<string, never>>;
 };
 
-export default function SignupPage({ params }: SignupPageProps) {
-  void params;
+function SignupForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isAuthenticated, refresh } = useCurrentUser();
@@ -91,7 +91,7 @@ export default function SignupPage({ params }: SignupPageProps) {
         );
         router.prefetch("/login");
         setFormState(defaultFormState);
-      } catch (error) {
+      } catch {
         setErrorMessage("회원가입 처리 중 문제가 발생했습니다.");
       } finally {
         setIsSubmitting(false);
@@ -188,5 +188,23 @@ export default function SignupPage({ params }: SignupPageProps) {
         </figure>
       </div>
     </div>
+  );
+}
+
+function SignupFormFallback() {
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <Loader2 className="h-8 w-8 animate-spin text-slate-600" />
+    </div>
+  );
+}
+
+export default function SignupPage({ params }: SignupPageProps) {
+  void params;
+
+  return (
+    <Suspense fallback={<SignupFormFallback />}>
+      <SignupForm />
+    </Suspense>
   );
 }

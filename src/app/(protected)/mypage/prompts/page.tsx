@@ -69,7 +69,7 @@ const mockPrompts: PromptHistory[] = [
 
 export default function PromptsPage({ params }: PromptsPageProps) {
   void params;
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [prompts, setPrompts] = useState<PromptHistory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -83,8 +83,8 @@ export default function PromptsPage({ params }: PromptsPageProps) {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    const locale = t.locale === 'ko' ? 'ko-KR' : 'en-US';
-    return date.toLocaleDateString(locale, {
+    const dateLocale = locale === 'ko' ? 'ko-KR' : 'en-US';
+    return date.toLocaleDateString(dateLocale, {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
