@@ -151,7 +151,7 @@ export default function DashboardPage({ params }: DashboardPageProps) {
       <div>
         <h1 className="text-3xl font-bold">
           {user?.userMetadata?.full_name
-            ? t('dashboard.greeting', { name: user.userMetadata.full_name })
+            ? t('dashboard.greeting', { name: String(user.userMetadata.full_name) })
             : t('dashboard.greetingDefault')}
         </h1>
         <p className="text-muted-foreground mt-1">
