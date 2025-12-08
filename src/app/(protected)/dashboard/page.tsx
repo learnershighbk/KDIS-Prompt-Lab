@@ -146,12 +146,17 @@ export default function DashboardPage({ params }: DashboardPageProps) {
     );
   }
 
+  const fullName = user?.userMetadata?.full_name;
+  const displayName = typeof fullName === 'string' || typeof fullName === 'number' 
+    ? String(fullName) 
+    : null;
+
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold">
-          {user?.userMetadata?.full_name
-            ? t('dashboard.greeting', { name: String(user.userMetadata.full_name) })
+          {displayName
+            ? t('dashboard.greeting', { name: displayName })
             : t('dashboard.greetingDefault')}
         </h1>
         <p className="text-muted-foreground mt-1">
