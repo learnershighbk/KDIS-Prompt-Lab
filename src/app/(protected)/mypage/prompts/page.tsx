@@ -83,7 +83,8 @@ export default function PromptsPage({ params }: PromptsPageProps) {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('ko-KR', {
+    const locale = t.locale === 'ko' ? 'ko-KR' : 'en-US';
+    return date.toLocaleDateString(locale, {
       year: 'numeric',
       month: 'short',
       day: 'numeric',

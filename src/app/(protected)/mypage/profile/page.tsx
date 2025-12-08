@@ -28,26 +28,28 @@ type ProfilePageProps = {
   params: Promise<Record<string, never>>;
 };
 
-const departments = [
-  '공공정책대학원',
-  '국제개발정책대학원',
-  '경영대학원',
-  '기타',
+const getDepartments = (t: ReturnType<typeof useTranslation>['t']) => [
+  t('profile.departments.publicPolicy'),
+  t('profile.departments.internationalDevelopment'),
+  t('profile.departments.business'),
+  t('profile.departments.other'),
 ];
 
-const programs = [
-  'MPP (공공정책학 석사)',
-  'MPM (공공관리학 석사)',
-  'MDP (국제개발정책학 석사)',
-  'MBA',
-  '박사과정',
-  '기타',
+const getPrograms = (t: ReturnType<typeof useTranslation>['t']) => [
+  t('profile.programs.mpp'),
+  t('profile.programs.mpm'),
+  t('profile.programs.mdp'),
+  t('profile.programs.mba'),
+  t('profile.programs.phd'),
+  t('profile.programs.other'),
 ];
 
 export default function ProfilePage({ params }: ProfilePageProps) {
   void params;
   const { user } = useAuthStore();
   const { t } = useTranslation();
+  const departments = getDepartments(t);
+  const programs = getPrograms(t);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [formData, setFormData] = useState({

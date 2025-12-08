@@ -31,11 +31,19 @@ function getStepsCompletedFromPercentage(percentage: number): number {
 
 export default function ModulesPage({ params }: ModulesPageProps) {
   void params;
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const { data, isLoading, error } = useModules();
 
   const modules = data?.modules ?? [];
+
+  const getModuleTitle = (module: typeof modules[0]) => {
+    return locale === 'en' && module.titleEn ? module.titleEn : module.title;
+  };
+
+  const getModuleDescription = (module: typeof modules[0]) => {
+    return locale === 'en' && module.descriptionEn ? module.descriptionEn : module.description;
+  };
 
   const getStatusIcon = (module: typeof modules[0]) => {
     if (module.isLocked) {
@@ -64,9 +72,14 @@ export default function ModulesPage({ params }: ModulesPageProps) {
   };
 
   const filteredModules = modules.filter(
-    (module) =>
-      module.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (module.description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false)
+    (module) => {
+      const title = getModuleTitle(module);
+      const description = getModuleDescription(module);
+      return (
+        title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false)
+      );
+    }
   );
 
   if (isLoading) {
@@ -88,8 +101,8 @@ export default function ModulesPage({ params }: ModulesPageProps) {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">{t('modules.title')}</h1>
-        <p className="text-muted-foreground mt-1">
+        <h1 className="text-4xl font-bold">{t('modules.title')}</h1>
+        <p className="text-lg text-muted-foreground mt-1">
           {t('modules.description', { count: modules.length })}
         </p>
       </div>
@@ -121,11 +134,11 @@ export default function ModulesPage({ params }: ModulesPageProps) {
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0 mt-1">{getStatusIcon(module)}</div>
                     <div>
-                      <CardTitle className="text-xl">
-                        Module {module.orderIndex}: {module.title}
+                      <CardTitle className="text-2xl">
+                        Module {module.orderIndex}: {getModuleTitle(module)}
                       </CardTitle>
-                      <CardDescription className="mt-1">
-                        {module.description}
+                      <CardDescription className="mt-1 text-base">
+                        {getModuleDescription(module)}
                       </CardDescription>
                     </div>
                   </div>
@@ -143,7 +156,7 @@ export default function ModulesPage({ params }: ModulesPageProps) {
                   </div>
 
                   <div className="flex items-center justify-between pt-4 border-t">
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-base text-muted-foreground">
                       {module.progress && module.progress.status !== 'not_started' && (
                         <span>
                           {t('modules.progress', {

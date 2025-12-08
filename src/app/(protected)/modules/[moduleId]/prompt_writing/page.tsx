@@ -177,16 +177,16 @@ export default function PromptWritingPage({ params }: PromptWritingPageProps) {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <h4 className="font-medium mb-2">상황</h4>
-                <p className="text-sm text-muted-foreground">{scenario.context}</p>
+                <h4 className="text-base font-medium mb-2">상황</h4>
+                <p className="text-base text-muted-foreground">{scenario.context}</p>
               </div>
               <div>
-                <h4 className="font-medium mb-2">목표</h4>
-                <p className="text-sm text-muted-foreground">{scenario.goal}</p>
+                <h4 className="text-base font-medium mb-2">목표</h4>
+                <p className="text-base text-muted-foreground">{scenario.goal}</p>
               </div>
               <div>
-                <h4 className="font-medium mb-2">팁</h4>
-                <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                <h4 className="text-base font-medium mb-2">팁</h4>
+                <ul className="list-disc list-inside text-base text-muted-foreground space-y-1">
                   {scenario.tips.map((tip, idx) => (
                     <li key={idx}>{tip}</li>
                   ))}
@@ -265,11 +265,11 @@ export default function PromptWritingPage({ params }: PromptWritingPageProps) {
             {response ? (
               <div className="space-y-4">
                 <div className="prose prose-sm max-w-none">
-                  <div className="whitespace-pre-wrap text-sm">{response}</div>
+                  <div className="whitespace-pre-wrap text-base">{response}</div>
                 </div>
                 <div className="flex items-center gap-2 pt-4 border-t">
-                  <CheckCircle className="h-5 w-5 text-green-500" />
-                  <span className="text-sm text-muted-foreground">
+                  <CheckCircle className="h-6 w-6 text-green-500" />
+                  <span className="text-base text-muted-foreground">
                     프롬프트가 분석되었습니다. 다음 단계로 진행하세요.
                   </span>
                 </div>
@@ -281,7 +281,7 @@ export default function PromptWritingPage({ params }: PromptWritingPageProps) {
             ) : (
               <div className="text-center py-12 text-muted-foreground">
                 <Bot className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>프롬프트를 작성하고 제출해주세요</p>
+                <p className="text-base">프롬프트를 작성하고 제출해주세요</p>
               </div>
             )}
           </CardContent>

@@ -58,7 +58,9 @@
     "journals": "저널",
     "prompts": "프롬프트",
     "start": "시작하기",
-    "goToDashboard": "대시보드로 이동"
+    "goToDashboard": "대시보드로 이동",
+    "instructorMenu": "교수자 메뉴",
+    "instructorDashboard": "교수자 대시보드"
   },
   "landing": {
     "kdiSchoolOnly": "KDI School 전용",
@@ -231,7 +233,29 @@
     "totalResources": "총 {count}개의 리소스",
     "open": "열기",
     "noResults": "검색 결과가 없습니다",
-    "tryDifferentSearch": "다른 검색어나 필터를 시도해보세요"
+    "tryDifferentSearch": "다른 검색어나 필터를 시도해보세요",
+    "items": {
+      "openaiGuide": {
+        "title": "OpenAI 프롬프트 엔지니어링 가이드",
+        "description": "OpenAI 공식 문서 기반의 프롬프트 작성 가이드입니다."
+      },
+      "anthropicGuide": {
+        "title": "Anthropic Claude 공식 프롬프트 가이드",
+        "description": "Claude 모델의 특성과 효과적인 프롬프트 작성법을 설명하는 공식 가이드입니다."
+      },
+      "chainOfThought": {
+        "title": "체인 오브 쏘트(Chain of Thought) 프롬프팅",
+        "description": "복잡한 추론 작업을 위한 단계적 사고 유도 기법을 설명합니다."
+      },
+      "fewShotLearning": {
+        "title": "Few-shot Learning 프롬프트 전략",
+        "description": "예시를 활용하여 AI의 출력 품질을 높이는 방법을 다룹니다."
+      },
+      "aiEthics": {
+        "title": "AI 윤리와 책임있는 사용",
+        "description": "AI 활용 시 고려해야 할 윤리적 측면과 모범 사례를 소개합니다."
+      }
+    }
   },
   "progress": {
     "title": "학습 진도",
@@ -310,7 +334,21 @@
     "configure": "설정하기",
     "deleteAccount": "계정 삭제",
     "permanentlyDeleteAccount": "계정을 영구적으로 삭제합니다",
-    "delete": "삭제하기"
+    "delete": "삭제하기",
+    "departments": {
+      "publicPolicy": "공공정책대학원",
+      "internationalDevelopment": "국제개발정책대학원",
+      "business": "경영대학원",
+      "other": "기타"
+    },
+    "programs": {
+      "mpp": "MPP (공공정책학 석사)",
+      "mpm": "MPM (공공관리학 석사)",
+      "mdp": "MDP (국제개발정책학 석사)",
+      "mba": "MBA",
+      "phd": "박사과정",
+      "other": "기타"
+    }
   }
 }
 

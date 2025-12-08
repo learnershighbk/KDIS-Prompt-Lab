@@ -38,45 +38,45 @@ interface Resource {
   duration?: string;
 }
 
-const resources: Resource[] = [
+const getResources = (t: ReturnType<typeof useTranslation>['t']): Resource[] => [
   {
     id: '1',
-    title: 'OpenAI 프롬프트 엔지니어링 가이드',
-    description: 'OpenAI 공식 문서 기반의 프롬프트 작성 가이드입니다.',
+    title: t('resources.items.openaiGuide.title'),
+    description: t('resources.items.openaiGuide.description'),
     type: 'document',
-    category: '기초',
+    category: t('resources.basic'),
     url: 'https://platform.openai.com/docs/guides/prompt-engineering',
   },
   {
     id: '2',
-    title: 'Anthropic Claude 공식 프롬프트 가이드',
-    description: 'Claude 모델의 특성과 효과적인 프롬프트 작성법을 설명하는 공식 가이드입니다.',
+    title: t('resources.items.anthropicGuide.title'),
+    description: t('resources.items.anthropicGuide.description'),
     type: 'link',
-    category: '기초',
+    category: t('resources.basic'),
     url: 'https://docs.anthropic.com/claude/docs/intro-to-prompting',
   },
   {
     id: '3',
-    title: '체인 오브 쏘트(Chain of Thought) 프롬프팅',
-    description: '복잡한 추론 작업을 위한 단계적 사고 유도 기법을 설명합니다.',
+    title: t('resources.items.chainOfThought.title'),
+    description: t('resources.items.chainOfThought.description'),
     type: 'article',
-    category: '심화',
+    category: t('resources.advanced'),
     url: 'https://www.promptingguide.ai/techniques/cot',
   },
   {
     id: '4',
-    title: 'Few-shot Learning 프롬프트 전략',
-    description: '예시를 활용하여 AI의 출력 품질을 높이는 방법을 다룹니다.',
+    title: t('resources.items.fewShotLearning.title'),
+    description: t('resources.items.fewShotLearning.description'),
     type: 'document',
-    category: '심화',
+    category: t('resources.advanced'),
     url: 'https://www.promptingguide.ai/techniques/fewshot',
   },
   {
     id: '5',
-    title: 'AI 윤리와 책임있는 사용',
-    description: 'AI 활용 시 고려해야 할 윤리적 측면과 모범 사례를 소개합니다.',
+    title: t('resources.items.aiEthics.title'),
+    description: t('resources.items.aiEthics.description'),
     type: 'article',
-    category: '기초',
+    category: t('resources.basic'),
     url: 'https://www.anthropic.com/responsible-ai',
   },
 ];
@@ -110,6 +110,8 @@ export default function ResourcesPage({ params }: ResourcesPageProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+
+  const resources = getResources(t);
 
   const filteredResources = resources.filter((resource) => {
     const matchesSearch =

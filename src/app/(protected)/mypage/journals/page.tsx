@@ -66,7 +66,8 @@ export default function JournalsPage({ params }: JournalsPageProps) {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('ko-KR', {
+    const locale = t.locale === 'ko' ? 'ko-KR' : 'en-US';
+    return date.toLocaleDateString(locale, {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -117,8 +118,8 @@ export default function JournalsPage({ params }: JournalsPageProps) {
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <BookMarked className="h-5 w-5" />
+                    <CardTitle className="text-xl flex items-center gap-2">
+                      <BookMarked className="h-6 w-6" />
                       {journal.moduleTitle}
                     </CardTitle>
                     <CardDescription className="flex items-center gap-2 mt-1">
@@ -141,37 +142,37 @@ export default function JournalsPage({ params }: JournalsPageProps) {
                 <CardContent className="space-y-6 pt-0">
                   <div className="space-y-4">
                     <div>
-                      <h4 className="font-medium text-sm text-muted-foreground mb-2">
+                      <h4 className="font-medium text-base text-muted-foreground mb-2">
                         {t('journals.mostImpressive')}
                       </h4>
-                      <p className="text-sm bg-muted p-3 rounded-lg">
+                      <p className="text-base bg-muted p-3 rounded-lg">
                         {journal.answers.learned}
                       </p>
                     </div>
 
                     <div>
-                      <h4 className="font-medium text-sm text-muted-foreground mb-2">
+                      <h4 className="font-medium text-base text-muted-foreground mb-2">
                         {t('journals.practicalApplication')}
                       </h4>
-                      <p className="text-sm bg-muted p-3 rounded-lg">
+                      <p className="text-base bg-muted p-3 rounded-lg">
                         {journal.answers.applied}
                       </p>
                     </div>
 
                     <div>
-                      <h4 className="font-medium text-sm text-muted-foreground mb-2">
+                      <h4 className="font-medium text-base text-muted-foreground mb-2">
                         {t('journals.learningChallenges')}
                       </h4>
-                      <p className="text-sm bg-muted p-3 rounded-lg">
+                      <p className="text-base bg-muted p-3 rounded-lg">
                         {journal.answers.challenges}
                       </p>
                     </div>
 
                     <div>
-                      <h4 className="font-medium text-sm text-muted-foreground mb-2">
+                      <h4 className="font-medium text-base text-muted-foreground mb-2">
                         {t('journals.areasForImprovement')}
                       </h4>
-                      <p className="text-sm bg-muted p-3 rounded-lg">
+                      <p className="text-base bg-muted p-3 rounded-lg">
                         {journal.answers.improvement}
                       </p>
                     </div>

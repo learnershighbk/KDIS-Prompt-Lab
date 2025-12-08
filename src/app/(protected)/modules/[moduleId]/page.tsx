@@ -216,8 +216,8 @@ export default function ModuleDetailPage({ params }: ModuleDetailPageProps) {
             <Badge variant="outline" className="mb-2">
               Module {module.orderIndex}
             </Badge>
-            <h1 className="text-3xl font-bold">{module.title}</h1>
-            <p className="text-muted-foreground mt-2 max-w-2xl">{module.description}</p>
+            <h1 className="text-4xl font-bold">{module.title}</h1>
+            <p className="text-lg text-muted-foreground mt-2 max-w-2xl">{module.description}</p>
           </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Clock className="h-4 w-4" />
@@ -236,8 +236,8 @@ export default function ModuleDetailPage({ params }: ModuleDetailPageProps) {
             <ul className="space-y-2">
               {module.objectives.map((obj, idx) => (
                 <li key={idx} className="flex items-start gap-2">
-                  <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span>{obj}</span>
+                  <CheckCircle className="h-6 w-6 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-base">{obj}</span>
                 </li>
               ))}
             </ul>
@@ -288,10 +288,10 @@ export default function ModuleDetailPage({ params }: ModuleDetailPageProps) {
                 </div>
 
                 <div className="flex-1">
-                  <div className="font-medium">
+                  <div className="text-base font-medium">
                     Step {index + 1}: {step.title}
                   </div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-base text-muted-foreground">
                     {step.description}
                   </div>
                 </div>

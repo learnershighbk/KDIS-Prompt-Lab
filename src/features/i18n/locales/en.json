@@ -58,7 +58,9 @@
     "journals": "Journals",
     "prompts": "Prompts",
     "start": "Get Started",
-    "goToDashboard": "Go to Dashboard"
+    "goToDashboard": "Go to Dashboard",
+    "instructorMenu": "Instructor Menu",
+    "instructorDashboard": "Instructor Dashboard"
   },
   "landing": {
     "kdiSchoolOnly": "KDI School Exclusive",
@@ -231,7 +233,29 @@
     "totalResources": "Total {count} resources",
     "open": "Open",
     "noResults": "No search results",
-    "tryDifferentSearch": "Try different search terms or filters"
+    "tryDifferentSearch": "Try different search terms or filters",
+    "items": {
+      "openaiGuide": {
+        "title": "OpenAI Prompt Engineering Guide",
+        "description": "A guide to writing prompts based on OpenAI official documentation."
+      },
+      "anthropicGuide": {
+        "title": "Anthropic Claude Official Prompt Guide",
+        "description": "Official guide explaining Claude model characteristics and effective prompt writing methods."
+      },
+      "chainOfThought": {
+        "title": "Chain of Thought Prompting",
+        "description": "Explains step-by-step thinking techniques for complex reasoning tasks."
+      },
+      "fewShotLearning": {
+        "title": "Few-shot Learning Prompt Strategy",
+        "description": "Covers methods to improve AI output quality using examples."
+      },
+      "aiEthics": {
+        "title": "AI Ethics and Responsible Use",
+        "description": "Introduces ethical considerations and best practices when using AI."
+      }
+    }
   },
   "progress": {
     "title": "Learning Progress",
@@ -310,7 +334,21 @@
     "configure": "Configure",
     "deleteAccount": "Delete Account",
     "permanentlyDeleteAccount": "Permanently delete account",
-    "delete": "Delete"
+    "delete": "Delete",
+    "departments": {
+      "publicPolicy": "Graduate School of Public Policy",
+      "internationalDevelopment": "Graduate School of International Development Policy",
+      "business": "Graduate School of Business",
+      "other": "Other"
+    },
+    "programs": {
+      "mpp": "MPP (Master of Public Policy)",
+      "mpm": "MPM (Master of Public Management)",
+      "mdp": "MDP (Master of Development Policy)",
+      "mba": "MBA",
+      "phd": "PhD Program",
+      "other": "Other"
+    }
   }
 }
 

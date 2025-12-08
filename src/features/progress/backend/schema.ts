@@ -33,6 +33,7 @@ export const progressOverviewResponseSchema = z.object({
   modules: z.array(z.object({
     moduleId: z.string().uuid(),
     moduleTitle: z.string(),
+    moduleTitleEn: z.string().nullable(),
     status: progressStatusSchema,
     currentStep: stepTypeSchema.nullable(),
     stepsCompleted: z.number(),

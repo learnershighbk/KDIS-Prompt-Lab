@@ -30,7 +30,7 @@ export async function getProgressOverview(
 ): Promise<ProgressOverviewResponse> {
   const { data: modules } = await supabase
     .from('modules')
-    .select('id, title, order_index')
+    .select('id, title, title_en, order_index')
     .eq('is_active', true)
     .order('order_index', { ascending: true });
 
@@ -54,6 +54,7 @@ export async function getProgressOverview(
     return {
       moduleId: m.id,
       moduleTitle: m.title,
+      moduleTitleEn: m.title_en,
       status: (progress?.status ?? 'not_started') as 'not_started' | 'in_progress' | 'completed',
       currentStep: progress?.current_step ?? null,
       stepsCompleted: getStepsCompleted(progress?.current_step, progress?.status === 'completed'),

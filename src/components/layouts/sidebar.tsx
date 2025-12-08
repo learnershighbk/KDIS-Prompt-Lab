@@ -18,28 +18,30 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { ROUTES } from '@/constants/routes';
 import { useAuthStore } from '@/features/auth/stores/auth.store';
+import { useTranslation } from '@/features/i18n/hooks/useTranslation';
 
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const mainNavItems = [
-  { href: ROUTES.DASHBOARD, label: '대시보드', icon: LayoutDashboard },
-  { href: ROUTES.MODULES, label: '학습 모듈', icon: BookOpen },
-  { href: ROUTES.RESOURCES, label: '학습 리소스', icon: Library },
-];
-
-const mypageNavItems = [
-  { href: ROUTES.MYPAGE.PROGRESS, label: '학습 진도', icon: BarChart3 },
-  { href: ROUTES.MYPAGE.JOURNALS, label: '성찰 저널', icon: BookMarked },
-  { href: ROUTES.MYPAGE.PROMPTS, label: '프롬프트 히스토리', icon: History },
-  { href: ROUTES.MYPAGE.PROFILE, label: '프로필 설정', icon: User },
-];
-
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const { hasRole } = useAuthStore();
+  const { t } = useTranslation();
+
+  const mainNavItems = [
+    { href: ROUTES.DASHBOARD, label: t('navigation.dashboard'), icon: LayoutDashboard },
+    { href: ROUTES.MODULES, label: t('navigation.modules'), icon: BookOpen },
+    { href: ROUTES.RESOURCES, label: t('navigation.resources'), icon: Library },
+  ];
+
+  const mypageNavItems = [
+    { href: ROUTES.MYPAGE.PROGRESS, label: t('navigation.progress'), icon: BarChart3 },
+    { href: ROUTES.MYPAGE.JOURNALS, label: t('navigation.journals'), icon: BookMarked },
+    { href: ROUTES.MYPAGE.PROMPTS, label: t('navigation.prompts'), icon: History },
+    { href: ROUTES.MYPAGE.PROFILE, label: t('navigation.profile'), icon: User },
+  ];
 
   const isInstructor = hasRole('instructor') || hasRole('admin');
 
@@ -94,7 +96,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
           <div className="space-y-2">
             <h3 className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              마이페이지
+              {t('navigation.mypage')}
             </h3>
             <div className="space-y-1">
               {mypageNavItems.map((item) => {
@@ -123,7 +125,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           {isInstructor && (
             <div className="space-y-2">
               <h3 className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                교수자 메뉴
+                {t('navigation.instructorMenu')}
               </h3>
               <div className="space-y-1">
                 <Link
@@ -137,7 +139,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   )}
                 >
                   <BarChart3 className="h-5 w-5" />
-                  교수자 대시보드
+                  {t('navigation.instructorDashboard')}
                 </Link>
               </div>
             </div>

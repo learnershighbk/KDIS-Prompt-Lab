@@ -21,8 +21,12 @@ type ProgressPageProps = {
 
 export default function ProgressPage({ params }: ProgressPageProps) {
   void params;
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { data, isLoading, error } = useProgressOverview();
+
+  const getModuleTitle = (module: typeof modules[0]) => {
+    return locale === 'en' && module.moduleTitleEn ? module.moduleTitleEn : module.moduleTitle;
+  };
 
   const modules = data?.modules ?? [];
   const overall = data?.overall;
@@ -142,7 +146,7 @@ export default function ProgressPage({ params }: ProgressPageProps) {
                       <span className="text-sm font-medium text-muted-foreground">
                         M{index + 1}
                       </span>
-                      <span className="font-medium">{module.moduleTitle}</span>
+                      <span className="font-medium">{getModuleTitle(module)}</span>
                       {getStatusBadge(module.status)}
                     </div>
                     <div className="flex items-center gap-2">

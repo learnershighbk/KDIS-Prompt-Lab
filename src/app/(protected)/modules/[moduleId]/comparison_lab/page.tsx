@@ -224,7 +224,7 @@ export default function ComparisonLabPage({ params }: ComparisonLabPageProps) {
             >
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">응답 A</CardTitle>
+                  <CardTitle className="text-xl">응답 A</CardTitle>
                   <Button
                     variant={selectedBetter === 'A' ? 'default' : 'outline'}
                     size="sm"
@@ -236,7 +236,7 @@ export default function ComparisonLabPage({ params }: ComparisonLabPageProps) {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="whitespace-pre-wrap text-sm bg-muted p-4 rounded-lg">
+                <div className="whitespace-pre-wrap text-base bg-muted p-4 rounded-lg">
                   {result.responseA}
                 </div>
               </CardContent>
@@ -250,7 +250,7 @@ export default function ComparisonLabPage({ params }: ComparisonLabPageProps) {
             >
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">응답 B</CardTitle>
+                  <CardTitle className="text-xl">응답 B</CardTitle>
                   <Button
                     variant={selectedBetter === 'B' ? 'default' : 'outline'}
                     size="sm"
@@ -262,7 +262,7 @@ export default function ComparisonLabPage({ params }: ComparisonLabPageProps) {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="whitespace-pre-wrap text-sm bg-muted p-4 rounded-lg">
+                <div className="whitespace-pre-wrap text-base bg-muted p-4 rounded-lg">
                   {result.responseB}
                 </div>
               </CardContent>
@@ -277,15 +277,15 @@ export default function ComparisonLabPage({ params }: ComparisonLabPageProps) {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="whitespace-pre-wrap text-sm">{result.analysis}</div>
+              <div className="whitespace-pre-wrap text-base">{result.analysis}</div>
             </CardContent>
           </Card>
 
           {selectedBetter && (
             <Card className="bg-green-50 border-green-200">
               <CardContent className="pt-6">
-                <div className="flex items-center gap-2 text-green-700">
-                  <ThumbsUp className="h-5 w-5" />
+                <div className="flex items-center gap-2 text-base text-green-700">
+                  <ThumbsUp className="h-6 w-6" />
                   <span>
                     프롬프트 {selectedBetter}를 더 효과적이라고 선택하셨습니다.
                     {selectedBetter === 'B' && ' 구체적이고 맥락이 풍부한 프롬프트가 더 좋은 결과를 이끌어냅니다!'}

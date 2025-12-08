@@ -187,9 +187,9 @@ export default function SocraticDialoguePage({ params }: SocraticDialoguePagePro
         <Card className="md:col-span-3 flex flex-col">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">{t('socratic.chatTitle')}</CardTitle>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <MessageCircle className="h-4 w-4" />
+              <CardTitle className="text-xl">{t('socratic.chatTitle')}</CardTitle>
+              <div className="flex items-center gap-2 text-base text-muted-foreground">
+                <MessageCircle className="h-5 w-5" />
                 <span>{exchangeCount} / {MAX_EXCHANGES} {t('socratic.exchanges')}</span>
               </div>
             </div>
@@ -227,7 +227,7 @@ export default function SocraticDialoguePage({ params }: SocraticDialoguePagePro
                         : 'bg-primary text-primary-foreground'
                     )}
                   >
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    <p className="text-base whitespace-pre-wrap">{message.content}</p>
                   </div>
                 </div>
               ))}
@@ -238,8 +238,8 @@ export default function SocraticDialoguePage({ params }: SocraticDialoguePagePro
                   </div>
                   <div className="bg-muted rounded-lg px-4 py-3">
                     <div className="flex items-center gap-2">
-                      <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                      <span className="text-sm text-muted-foreground">{t('socratic.thinking')}</span>
+                      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                      <span className="text-base text-muted-foreground">{t('socratic.thinking')}</span>
                     </div>
                   </div>
                 </div>
@@ -250,10 +250,10 @@ export default function SocraticDialoguePage({ params }: SocraticDialoguePagePro
             {canProceed ? (
               <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg p-4 text-center">
                 <CheckCircle2 className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                <p className="font-medium text-green-800 dark:text-green-200">
+                <p className="text-lg font-medium text-green-800 dark:text-green-200">
                   🎉 {t('socratic.complete')}
                 </p>
-                <p className="text-sm text-green-600 dark:text-green-400 mt-1">
+                <p className="text-base text-green-600 dark:text-green-400 mt-1">
                   {t('socratic.completeMessage')}
                 </p>
                 <Button onClick={handleComplete} className="mt-3 bg-green-600 hover:bg-green-700">
@@ -291,15 +291,15 @@ export default function SocraticDialoguePage({ params }: SocraticDialoguePagePro
 
         <Card className="md:col-span-1">
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Lightbulb className="h-5 w-5 text-yellow-500" />
+            <CardTitle className="text-xl flex items-center gap-2">
+              <Lightbulb className="h-6 w-6 text-yellow-500" />
               {t('socratic.hint')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {showHint ? (
               <div className="space-y-3">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-base text-muted-foreground">
                   {currentHints[currentHintIndex]}
                 </p>
                 <Button variant="outline" size="sm" onClick={handleShowHint}>
@@ -308,7 +308,7 @@ export default function SocraticDialoguePage({ params }: SocraticDialoguePagePro
               </div>
             ) : (
               <div className="space-y-3">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-base text-muted-foreground">
                   {t('socratic.hintDescription')}
                 </p>
                 <Button variant="outline" size="sm" onClick={handleShowHint}>
@@ -318,8 +318,8 @@ export default function SocraticDialoguePage({ params }: SocraticDialoguePagePro
             )}
 
             <div className="pt-4 border-t">
-              <h4 className="text-sm font-medium mb-2">💡 {t('socratic.learningGuide')}</h4>
-              <p className="text-xs text-muted-foreground">
+              <h4 className="text-base font-medium mb-2">💡 {t('socratic.learningGuide')}</h4>
+              <p className="text-sm text-muted-foreground">
                 {t('socratic.learningDescription', { count: MAX_EXCHANGES })}
                 {exchangeCount >= 2 && !canProceed && (
                   <span className="block mt-2 text-primary">

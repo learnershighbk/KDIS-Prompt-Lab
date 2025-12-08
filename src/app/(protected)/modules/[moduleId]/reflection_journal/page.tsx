@@ -120,8 +120,8 @@ export default function ReflectionJournalPage({ params }: ReflectionJournalPageP
               <div className="w-20 h-20 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-4">
                 <Trophy className="h-10 w-10 text-green-600" />
               </div>
-              <h2 className="text-2xl font-bold mb-2">모듈 완료!</h2>
-              <p className="text-muted-foreground">
+              <h2 className="text-3xl font-bold mb-2">모듈 완료!</h2>
+              <p className="text-lg text-muted-foreground">
                 {info.title} 모듈을 성공적으로 완료했습니다.
               </p>
             </div>
@@ -184,8 +184,8 @@ export default function ReflectionJournalPage({ params }: ReflectionJournalPageP
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="p-4 bg-muted rounded-lg">
-            <h3 className="font-medium mb-2">{info.title}</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="text-base font-medium mb-2">{info.title}</h3>
+            <p className="text-base text-muted-foreground">
               이 모듈에서 학습한 핵심 기술: {info.techniques.join(', ')}
             </p>
           </div>
@@ -204,7 +204,7 @@ export default function ReflectionJournalPage({ params }: ReflectionJournalPageP
                   rows={4}
                   className="resize-none"
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   {(answers[q.id]?.length || 0) < 10
                     ? `최소 10자 이상 작성해주세요 (현재 ${answers[q.id]?.length || 0}자)`
                     : <span className="text-green-600">작성 완료</span>}
